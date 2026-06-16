@@ -1,150 +1,207 @@
-# 📚 AI ニュース収集ダッシュボード
+# AI News Gathering Dashboard
 
-> Google News RSS・note・Zenn・Qiita などからAI関連情報をリアルタイム収集し、  
-> ダークテーマの美しいダッシュボードで表示するデスクトップアプリです。
+AI関連ニュース、技術記事、arXiv論文、自治体・企業のAI活用情報をまとめて収集し、Obsidian用Markdownとして整理できるデスクトップアプリです。
 
-![Streamlit](https://img.shields.io/badge/Streamlit-1.54.0-FF4B4B?style=flat&logo=streamlit)
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python)
-![Platform](https://img.shields.io/badge/Platform-Windows-0078D4?style=flat&logo=windows)
+Python環境を別途用意しなくても、Windows用インストーラーを実行するだけで使えます。
 
----
+## 主な機能
 
-## 📥 ダウンロード・インストール
+- AIニュースをGoogle News RSSから収集
+- note / Zenn / Qiita / はてな / 技術ブログ / X検索 / arXiv などからAI情報を収集
+- AI情報をカテゴリ別に表示
+- arXivのAI論文カテゴリは、今日新しく公開・更新された論文だけを表示
+- 地方自治体、企業、AIエージェント、ローカルLLM、AI画像生成、AI動画、AI音声、ゲーム開発、3D、アバター、AI論文などのカテゴリに対応
+- リンク先本文を取得し、Obsidian用Markdownに変換
+- カテゴリ別・テーマ別まとめMarkdownを生成
+- まとめMarkdownをもとに、note向けの記事ドラフトを生成
+- アプリ内で生成済みMarkdownを確認
+- 文章生成は無料のローカルLLMであるOllamaの `gemma4` を優先利用
+- Ollamaに接続できない場合はルールベース生成に自動退避
 
-**Python不要。インストーラーをダブルクリックするだけで使えます。**
+## インストール
 
-1. [**Releases**](../../releases/latest) を開く
-2. `AI-News-Dashboard-Setup.exe` をダウンロード
-3. ダブルクリック → インストールウィザードに従う
-4. 完了後「アプリを起動する」にチェックを入れてFinish
+Releases から最新版の `AI-News-Dashboard-Setup-*.exe` をダウンロードして実行してください。
 
-> **⚠️ Windows Defenderの警告について**
-> 初回起動時に「WindowsによってPCが保護されました」と表示される場合があります。
-> 「詳細情報」→「実行」をクリックしてください。（署名なしの個人開発アプリのため）
->
-> 🛡️ **VirusTotal スキャン結果: [0 / 67 — 全社クリア](https://www.virustotal.com/gui/file/bed0c12ebadac28aea34b240a2cae467031cd105d10332f507aca6e4699fb3c2/detection)**
-> 67社のセキュリティエンジンすべてで脅威なしと判定されています。
+既に旧バージョンをインストールしている場合は、同じアプリとしてアップデートされます。古いアプリ本体は新しいバージョンに置き換わります。
 
----
+初回起動時にWindows Defenderの警告が表示される場合があります。個人開発の未署名アプリのためです。
 
-## 🖥️ 起動方法
+1. 「詳細情報」をクリック
+2. 「実行」をクリック
+3. インストールウィザードに従ってインストール
 
-インストール後は以下のいずれかで起動できます：
+## 起動方法
 
-- **デスクトップのショートカット**をダブルクリック
-- スタートメニューから「AI ニュース収集ダッシュボード」を検索
+インストール後、以下のいずれかで起動できます。
 
-起動すると自動でブラウザが開き、ダッシュボードが表示されます。  
-アドレスは `http://localhost:8501` です。
+- デスクトップショートカット
+- スタートメニューの `AI News Dashboard`
+- インストールフォルダ内の `AI News Dashboard.exe`
 
----
+アプリ起動後、内部でStreamlitサーバーが立ち上がり、Electronウィンドウ内にダッシュボードが表示されます。
 
-## 🗺️ 画面の説明
+ローカルURLは以下です。
 
-サイドバーのメニューで3つのページを切り替えられます。
-
-### 📰 AIニュース
-
-Google News RSSからAI関連ニュースをリアルタイム収集して表示します。
-
-| 機能 | 詳細 |
-|------|------|
-| 検索キーワード | 任意のキーワードで記事を絞り込み |
-| 言語切替 | 日本語（ja/JP）・英語（en/US, en/GB）に対応 |
-| TOP 5 | スコアリングで注目記事をランキング表示（5分ごと自動更新） |
-| ページネーション | 10件ずつ表示、最大100件取得 |
-| カードUI | サムネイル画像付き・クリックで元記事を開く |
-
-**🔄 再取得ボタン**でキャッシュをクリアして最新情報を取得できます。
-
----
-
-### 🤖 AI情報
-
-開発者・研究者向けの技術情報を10ソースから収集します。
-
-**収集ソース：**  
-note / Zenn / Qiita / はてなブログ / X(Twitter) / 各種技術ブログ
-
-**カテゴリタブ：**
-
-| タブ | 内容 |
-|------|------|
-| GPT | OpenAI・ChatGPT関連 |
-| Claude | Anthropic・Claude関連 |
-| AI作曲 | Suno / Udio など音楽生成AI |
-| AI動画 | Sora / Runway など動画生成AI |
-| AI音声 | ElevenLabs など音声合成AI |
-| ローカル環境 | Ollama・LM Studioなどローカル実行 |
-| その他 | 上記以外のAI関連情報 |
-
----
-
-### 📋 日報
-
-毎日深夜0時に自動で生成されるAIニュースの日報です。
-
-**サイドバーのミニカレンダー**で過去の日報を閲覧できます。  
-日報が存在する日付はボタン表示、存在しない日はグレーで表示されます。
-
-**日報の構成：**
-
-```
-## 今日のAI概況      ← その日の全体的な流れ
-## 主な動き          ← トピックごとの解説 + 元記事要約カード
-## 今日の注目        ← 最重要トピックの深掘り
-## 編集後記          ← 一日の振り返り
+```text
+http://localhost:8501
 ```
 
-#### 生成方式の切り替え
+## 画面構成
 
-| 方式 | 品質 | 必要なもの |
-|------|------|-----------|
-| アルゴリズム生成 | ★★★　無料 | 何も不要 |
-| Claude API生成 | ★★★★★ 高精度 | Anthropic APIキー |
+### AI ニュース
 
-Claude APIを使うには、サイドバーの「Anthropic APIキー」欄に `sk-ant-` から始まるキーを入力してください。  
-APIキーは [Anthropic Console](https://console.anthropic.com/) から取得できます。
+Google News RSSからAI関連ニュースを収集します。
 
-**「🔄 再生成」ボタン**でいつでも最新の記事をもとに日報を作り直せます。
+- 検索キーワード指定
+- 日本語 / 英語ニュース切替
+- TOP 5表示
+- カテゴリタブ
+- ページネーション
+- サムネイル付きカード表示
 
----
+### AI 情報
 
-## 📁 データの保存場所
+AI関連の技術情報、活用事例、開発者向け記事、arXiv論文を収集します。
 
-インストールフォルダ内に自動作成されます（デフォルト: `C:\Program Files\AI-News-Dashboard\`）
+主な収集対象:
 
+- note
+- Zenn
+- Qiita
+- はてな
+- arXiv
+- X / SNS検索
+- 技術ブログ
+- 開発ツール関連情報
+- 自治体・行政DX情報
+- 企業のAI活用情報
+- ローカルLLM / OSS / ハードウェア情報
+
+主なカテゴリ:
+
+- GPT
+- Gemini
+- Grok
+- Claude
+- AIエージェント
+- 地方自治体
+- 企業
+- AI開発ツール
+- AI論文
+- AI画像生成
+- AI動画
+- 動画編集
+- AI音声
+- ローカルLLM
+- AI業務自動化
+- AI教育・研修
+- AIセキュリティ
+- ゲーム開発
+- アプリ開発
+- 3D
+- アバター
+- LLM
+- MCP
+- ハードウェア
+- オープンソース
+- HuggingFace
+- その他
+
+### Obsidian 出力
+
+収集した記事をObsidian用Markdownとして保存します。
+
+保存時に行うこと:
+
+- 取得済み記事をカテゴリ分類
+- リンク先本文を取得
+- 1記事ごとのMarkdownを作成
+- カテゴリ別Markdownを作成
+- テーマ別まとめMarkdownを作成
+- note記事風ドラフトを作成
+- 生成済みMarkdownをアプリ内で閲覧
+
+保存先:
+
+```text
+D:\新しいフォルダー (4)\notevalt
 ```
-AI-News-Dashboard\
-├── AI-News-Dashboard.exe
-├── daily_reports\    ← 日報データ（JSON）
-└── archives\         ← アーカイブ
+
+フォルダ構成:
+
+```text
+notevalt
+├─ 00_Inbox
+├─ 01_News_Sources
+├─ 02_Theme_Summaries
+├─ 03_Article_Drafts
+├─ 04_Published
+└─ 99_Templates
 ```
 
-日報データはアンインストールしても残ります。
+日付ごとに以下のような階層で保存されます。
 
----
-
-## 🛠️ ソースから起動する（開発者向け）
-
-```bash
-# Python 3.10以上が必要
-pip install -r requirements.txt
-streamlit run app.py
+```text
+01_News_Sources
+└─ 2026
+   └─ 06
+      └─ 16
+         ├─ AIエージェント
+         ├─ 地方自治体
+         ├─ AI論文
+         └─ ...
 ```
 
----
+## Ollamaについて
 
-## 🔧 技術スタック
+記事ドラフトや要約生成では、ローカルLLMのOllama `gemma4` を優先して使います。
 
-- [Streamlit](https://streamlit.io/) — UIフレームワーク
-- [feedparser](https://feedparser.readthedocs.io/) — RSS取得・解析
-- [Anthropic API](https://www.anthropic.com/) — 日報のAI生成（任意）
-- Google News RSS — ニュースソース
-- PyInstaller + Inno Setup — Windows実行ファイル化
+Ollamaを使う場合:
 
----
+```powershell
+ollama pull gemma4
+ollama serve
+```
 
-## 📝 著作権
+Ollamaが起動していない場合でも、アプリはルールベース生成に切り替えて動作します。
 
-© 2026 testakahori. All Rights Reserved.
+## 開発者向け
+
+ソースからStreamlitとして起動する場合:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+ローカルでElectron版を起動する場合:
+
+```powershell
+npm install
+npm run start
+```
+
+Windowsインストーラーを作成する場合:
+
+```powershell
+npm install
+npm run dist
+```
+
+ビルド時は `resources/python-dist` 相当のPythonランタイムを `buildResources/python-dist` または既存インストール済みアプリのランタイムから取り込む構成です。
+
+## バージョン
+
+現在のバージョン: `1.1.0`
+
+## 技術スタック
+
+- Streamlit
+- feedparser
+- Ollama
+- arXiv RSS
+- Google News RSS
+- Electron
+- electron-builder
+

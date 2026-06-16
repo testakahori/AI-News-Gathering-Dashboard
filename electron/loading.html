@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI News Dashboard — 起動中</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #1a120b;
+      color: #d4b896;
+      font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    /* 書棚 SVG ロゴ */
+    .logo-wrap {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    svg.bookshelf {
+      width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 0 12px rgba(201, 169, 110, 0.4));
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #c9a96e;
+      letter-spacing: 0.12em;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #8a7060;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    /* スピナー */
+    .spinner-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #3a2818;
+      border-top-color: #c9a96e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status {
+      font-size: 13px;
+      color: #8a7060;
+      letter-spacing: 0.05em;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* 装飾ライン */
+    .divider {
+      width: 200px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #c9a96e55, transparent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-wrap">
+      <!-- 書棚アイコン SVG -->
+      <svg class="bookshelf" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- 棚板 -->
+        <rect x="5" y="80" width="90" height="6" rx="2" fill="#c9a96e"/>
+        <rect x="5" y="48" width="90" height="6" rx="2" fill="#c9a96e"/>
+        <rect x="5" y="16" width="90" height="6" rx="2" fill="#c9a96e"/>
+        <!-- 側板 -->
+        <rect x="5" y="16" width="5" height="70" rx="1" fill="#a07840"/>
+        <rect x="90" y="16" width="5" height="70" rx="1" fill="#a07840"/>
+        <!-- 下段の本 -->
+        <rect x="12" y="56" width="10" height="24" rx="1" fill="#8b2e2e"/>
+        <rect x="24" y="59" width="8"  height="21" rx="1" fill="#2e5c8b"/>
+        <rect x="34" y="54" width="12" height="26" rx="1" fill="#4a7a3a"/>
+        <rect x="48" y="57" width="9"  height="23" rx="1" fill="#7a4a2e"/>
+        <rect x="59" y="55" width="11" height="25" rx="1" fill="#5c3d8b"/>
+        <rect x="72" y="58" width="8"  height="22" rx="1" fill="#8b6e2e"/>
+        <rect x="82" y="56" width="7"  height="24" rx="1" fill="#3a6b6b"/>
+        <!-- 上段の本 -->
+        <rect x="12" y="24" width="9"  height="24" rx="1" fill="#6b3a8b"/>
+        <rect x="23" y="26" width="11" height="22" rx="1" fill="#8b5a2e"/>
+        <rect x="36" y="23" width="8"  height="25" rx="1" fill="#2e6b4a"/>
+        <rect x="46" y="25" width="10" height="23" rx="1" fill="#8b2e4a"/>
+        <rect x="58" y="24" width="9"  height="24" rx="1" fill="#3a4a8b"/>
+        <rect x="69" y="26" width="12" height="22" rx="1" fill="#6b6b2e"/>
+        <rect x="83" y="23" width="7"  height="25" rx="1" fill="#8b3a2e"/>
+        <!-- 光の反射 -->
+        <rect x="12" y="24" width="2" height="24" rx="1" fill="rgba(255,255,255,0.15)"/>
+        <rect x="34" y="54" width="2" height="26" rx="1" fill="rgba(255,255,255,0.15)"/>
+      </svg>
+    </div>
+
+    <div class="title">AI News Dashboard</div>
+    <div class="divider"></div>
+
+    <div class="spinner-wrap">
+      <div class="spinner"></div>
+      <div class="status" id="statusText">サーバーを起動しています...</div>
+    </div>
+
+    <div class="subtitle">しばらくお待ちください</div>
+  </div>
+
+  <script>
+    const messages = [
+      "サーバーを起動しています...",
+      "Python 環境を読み込んでいます...",
+      "Streamlit を初期化しています...",
+      "ニュースフィードを準備しています...",
+      "もうすぐ完了します...",
+    ];
+    let idx = 0;
+    const el = document.getElementById("statusText");
+    setInterval(() => {
+      idx = (idx + 1) % messages.length;
+      el.textContent = messages[idx];
+    }, 3000);
+  </script>
+</body>
+</html>

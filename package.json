@@ -1,0 +1,66 @@
+{
+  "name": "ai-news-gathering-dashboard",
+  "version": "1.1.0",
+  "description": "AI News Gathering Dashboard desktop app",
+  "main": "electron/main.js",
+  "author": "testakahori",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis",
+    "pack": "electron-builder --win dir"
+  },
+  "devDependencies": {
+    "electron": "^38.5.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.electron.ai-news-gathering-dashboard",
+    "productName": "AI News Dashboard",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "app.py",
+        "to": "app.py"
+      },
+      {
+        "from": "requirements.txt",
+        "to": "requirements.txt"
+      },
+      {
+        "from": "assets",
+        "to": "assets"
+      },
+      {
+        "from": "../resources/python-dist",
+        "to": "python-dist"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI News Dashboard",
+      "artifactName": "AI-News-Dashboard-Setup-${version}.${ext}",
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
