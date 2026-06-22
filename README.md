@@ -1,173 +1,107 @@
-# AI News Gathering Dashboard
+# AI News Dashboard
 
-AI関連ニュース、技術記事、arXiv論文、自治体・企業のAI活用情報をまとめて収集し、Obsidian用Markdownとして整理できるデスクトップアプリです。
-
-Python環境を別途用意しなくても、Windows用インストーラーを実行するだけで使えます。
+AIニュース、技術記事、note、ブログ、arXiv論文を収集し、Obsidianで記事化しやすいMarkdown素材へ整理するローカル専用ダッシュボードです。
 
 ## 主な機能
 
 - AIニュースをGoogle News RSSから収集
-- note / Zenn / Qiita / はてな / 技術ブログ / X検索 / arXiv などからAI情報を収集
-- AI情報をカテゴリ別に表示
-- arXivのAI論文カテゴリは、今日新しく公開・更新された論文だけを表示
-- 地方自治体、企業、AIエージェント、ローカルLLM、AI画像生成、AI動画、AI音声、ゲーム開発、3D、アバター、AI論文などのカテゴリに対応
-- リンク先本文を取得し、Obsidian用Markdownに変換
-- カテゴリ別・テーマ別まとめMarkdownを生成
-- まとめMarkdownをもとに、note向けの記事ドラフトを生成
-- アプリ内で生成済みMarkdownを確認
-- 文章生成は無料のローカルLLMであるOllamaの `gemma4` を優先利用
-- Ollamaに接続できない場合はルールベース生成に自動退避
-
-## インストール
-
-Releases から最新版の `AI-News-Dashboard-Setup-*.exe` をダウンロードして実行してください。
-
-既に旧バージョンをインストールしている場合は、同じアプリとしてアップデートされます。古いアプリ本体は新しいバージョンに置き換わります。
-
-初回起動時にWindows Defenderの警告が表示される場合があります。個人開発の未署名アプリのためです。
-
-1. 「詳細情報」をクリック
-2. 「実行」をクリック
-3. インストールウィザードに従ってインストール
+- AI情報をnote、Zenn、Qiita、技術ブログ、公式情報、arXivから収集
+- AI情報は初心者向けすぎる記事、日記、ポエム、小説生成だけの記事、内容の薄い宣伝記事を除外
+- arXivは今日新しく公開されたAI関連論文のみをAI論文カテゴリに表示
+- Obsidian出力時にリンク先本文を取得し、冒頭抜粋ではなく本文内容をもとに要約
+- Ollama `gemma4` で分類、要約、fact、hypothesis、trend、AI Note、記事ドラフトを生成
+- 外部有料API、Gemini API、Anthropic APIは不要
+- 生成済みMarkdownをアプリ内で閲覧可能
 
 ## 起動方法
 
 インストール後、以下のいずれかで起動できます。
 
-- デスクトップショートカット
-- スタートメニューの `AI News Dashboard`
-- インストールフォルダ内の `AI News Dashboard.exe`
+- デスクトップショートカットをダブルクリック
+- スタートメニューから `AI News Dashboard` を起動
+- 開発用フォルダでは `run_app.bat` をダブルクリック
 
-アプリ起動後、内部でStreamlitサーバーが立ち上がり、Electronウィンドウ内にダッシュボードが表示されます。
-
-ローカルURLは以下です。
+起動後、ブラウザで次のURLが開きます。
 
 ```text
 http://localhost:8501
 ```
 
-## 画面構成
+## 画面
 
-### AI ニュース
+- `AI ニュース`: AI関連ニュースを収集、検索、カテゴリ表示します。
+- `AI 情報`: note、技術ブログ、arXivなどからAI活用・開発情報を収集します。
+- `Obsidian 出力`: 収集済み素材をObsidian Vault向けMarkdownとして保存し、生成結果をアプリ内で確認できます。
 
-Google News RSSからAI関連ニュースを収集します。
+## Obsidian Vault
 
-- 検索キーワード指定
-- 日本語 / 英語ニュース切替
-- TOP 5表示
-- カテゴリタブ
-- ページネーション
-- サムネイル付きカード表示
-
-### AI 情報
-
-AI関連の技術情報、活用事例、開発者向け記事、arXiv論文を収集します。
-
-主な収集対象:
-
-- note
-- Zenn
-- Qiita
-- はてな
-- arXiv
-- X / SNS検索
-- 技術ブログ
-- 開発ツール関連情報
-- 自治体・行政DX情報
-- 企業のAI活用情報
-- ローカルLLM / OSS / ハードウェア情報
-
-主なカテゴリ:
-
-- GPT
-- Gemini
-- Grok
-- Claude
-- AIエージェント
-- 地方自治体
-- 企業
-- AI開発ツール
-- AI論文
-- AI画像生成
-- AI動画
-- 動画編集
-- AI音声
-- ローカルLLM
-- AI業務自動化
-- AI教育・研修
-- AIセキュリティ
-- ゲーム開発
-- アプリ開発
-- 3D
-- アバター
-- LLM
-- MCP
-- ハードウェア
-- オープンソース
-- HuggingFace
-- その他
-
-### Obsidian 出力
-
-収集した記事をObsidian用Markdownとして保存します。
-
-保存時に行うこと:
-
-- 取得済み記事をカテゴリ分類
-- リンク先本文を取得
-- 1記事ごとのMarkdownを作成
-- カテゴリ別Markdownを作成
-- テーマ別まとめMarkdownを作成
-- note記事風ドラフトを作成
-- 生成済みMarkdownをアプリ内で閲覧
-
-保存先:
+保存先は次のフォルダです。
 
 ```text
 D:\新しいフォルダー (4)\notevalt
 ```
 
-フォルダ構成:
+想定フォルダ構成:
 
 ```text
-notevalt
-├─ 00_Inbox
-├─ 01_News_Sources
-├─ 02_Theme_Summaries
-├─ 03_Article_Drafts
-├─ 04_Published
-└─ 99_Templates
-```
-
-日付ごとに以下のような階層で保存されます。
-
-```text
+00_Inbox
 01_News_Sources
-└─ 2026
-   └─ 06
-      └─ 16
-         ├─ AIエージェント
-         ├─ 地方自治体
-         ├─ AI論文
-         └─ ...
+02_Theme_Summaries
+03_Article_Drafts
+04_Published
+05_fact
+06_hypothesis
+07_trend
+08_article
+09_AI_Note
+10_arXiv
+11_Logs
+99_Templates
 ```
 
-## Ollamaについて
+日付管理するフォルダ:
 
-記事ドラフトや要約生成では、ローカルLLMのOllama `gemma4` を優先して使います。
+- `01_News_Sources`
+- `05_fact`
+- `06_hypothesis`
+- `09_AI_Note`
+- `10_arXiv`
+- `11_Logs`
 
-Ollamaを使う場合:
+テーマ単位で育てるフォルダ:
+
+- `07_trend`
+
+記事タイトル単位で保存するフォルダ:
+
+- `08_article`
+
+## Obsidian出力で生成されるもの
+
+- `01_News_Sources`: 1記事1Markdownのニュース本文・要約
+- `02_Theme_Summaries`: その日に見つかった記事化候補テーマの整理
+- `05_fact`: 事実だけを抽出したMarkdown
+- `06_hypothesis`: factを根拠にした仮説Markdown
+- `07_trend`: テーマごとの長期トレンド更新
+- `09_AI_Note`: 今日の注目テーマ、起きたこと、見えた変化、投稿ネタ候補
+- `10_arXiv`: 今日新規公開されたAI関連論文
+- `11_Logs`: 本文取得失敗、除外理由、Ollamaエラー、生成ファイル一覧
+- `03_Article_Drafts` / `08_article`: note向けの記事下書き・完成候補
+
+## Ollama
+
+文章生成、分類、要約、記事生成はローカルのOllama `gemma4` を使います。
 
 ```powershell
 ollama pull gemma4
 ollama serve
 ```
 
-Ollamaが起動していない場合でも、アプリはルールベース生成に切り替えて動作します。
+Ollamaに接続できない場合、一部処理はルールベースで補完しますが、記事生成や高品質要約には `gemma4` の利用を推奨します。
 
 ## 開発者向け
 
-ソースからStreamlitとして起動する場合:
+手動で起動する場合:
 
 ```powershell
 python -m venv .venv
@@ -175,33 +109,11 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-ローカルでElectron版を起動する場合:
-
-```powershell
-npm install
-npm run start
-```
-
-Windowsインストーラーを作成する場合:
-
-```powershell
-npm install
-npm run dist
-```
-
-ビルド時は `resources/python-dist` 相当のPythonランタイムを `buildResources/python-dist` または既存インストール済みアプリのランタイムから取り込む構成です。
-
-## バージョン
-
-現在のバージョン: `1.1.0`
-
 ## 技術スタック
 
 - Streamlit
 - feedparser
-- Ollama
-- arXiv RSS
-- Google News RSS
-- Electron
-- electron-builder
-
+- requests / BeautifulSoup
+- Ollama gemma4
+- PyInstaller
+- Electron / electron-builder

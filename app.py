@@ -525,7 +525,7 @@ h3 {
     line-height: 1.75;
 }
 
-/* ── AI Note キーワードカード ───────────────── */
+/* ── Obsidian結果カード ───────────────── */
 .kw-idea-card,
 .kw-idea-card *:not(a) {
     color: #ffffff !important;
@@ -1320,145 +1320,11 @@ CAT_KEYS: dict[str, str] = {
     "その他":       "other",
 }
 
-NOTE_IDEA_COUNT = 10
-
-PERSONA_CATEGORY_WEIGHTS: dict[str, float] = {
-    "企業": 36,
-    "地方自治体": 34,
-    "ローカルLLM": 30,
-    "AIエージェント": 26,
-    "AI開発ツール": 24,
-    "AI論文": 23,
-    "AI業務自動化": 23,
-    "アプリ開発": 22,
-    "AIセキュリティ": 21,
-    "AI教育・研修": 19,
-    "LLM": 20,
-    "MCP": 18,
-    "動画編集": 16,
-    "3D": 14,
-    "アバター": 14,
-    "ゲーム開発": 12,
-    "AI画像生成": 11,
-    "AI動画": 10,
-}
-
-SEO_INTENT_KEYWORDS = [
-    "使い方", "始め方", "導入", "導入事例", "活用事例", "比較",
-    "料金", "無料", "ガイドライン", "業務効率化", "自動化",
-    "事例", "メリット", "注意点", "セキュリティ", "社内",
-    "自治体", "企業", "dx", "rag", "ローカルllm",
-]
-
-NOTE_KEYWORD_TEMPLATES: dict[str, str] = {
-    "企業": "生成AI 企業 活用事例、社内AI 導入、業務効率化",
-    "地方自治体": "生成AI 自治体 活用事例、デジタル庁 ガイドライン、自治体DX",
-    "ローカルLLM": "ローカルLLM 始め方、Ollama 使い方、社内LLM",
-    "AIエージェント": "AIエージェント 業務自動化、n8n 使い方、Dify 活用事例",
-    "AI業務自動化": "AI業務自動化、n8n AI活用、Dify 業務効率化",
-    "AI教育・研修": "生成AI研修、AIリテラシー教育、自治体 AI研修",
-    "AIセキュリティ": "生成AI セキュリティ、プロンプトインジェクション 対策、シャドーAI リスク",
-    "AI開発ツール": "AI開発ツール 比較、Cursor 使い方、Claude Code 活用",
-    "AI論文": "arXiv 今日のAI論文、AI論文 実務応用、LLM ベンチマーク、AIエージェント 論文",
-    "アプリ開発": "生成AIアプリ 開発、RAGアプリ 作り方、Streamlit AIアプリ",
-    "LLM": "LLM 最新動向、RAG 使い方、生成AI モデル比較",
-    "MCP": "MCP 使い方、Claude MCP 連携、AIエージェント 拡張",
-    "動画編集": "AI動画編集 使い方、Remotion 活用、ショート動画 自動化",
-    "3D": "AI 3D生成、Meshy 使い方、Blender AI活用",
-    "アバター": "AIアバター 作り方、VRM 活用、動画生成 アバター",
-    "ゲーム開発": "AIゲーム開発、Unity AI活用、Unreal Engine 生成AI",
-    "AI画像生成": "画像生成AI 使い方、Midjourney 比較、Stable Diffusion 商用利用",
-    "AI動画": "AI動画生成 比較、Sora 使い方、Runway 活用事例",
-    "AI音声": "AI音声 使い方、音声クローン 注意点、ElevenLabs 活用",
-    "オープンソース": "オープンソースAI 比較、無料AIツール、商用利用 ライセンス",
-    "ハードウェア": "ローカルLLM GPU、AI PC 比較、NPU 使い道",
-    "その他": "生成AI 最新トレンド、AIニュース まとめ、AI情報収集",
-}
-
-NOTE_FALLBACK_CATEGORIES = [
-    "企業", "地方自治体", "ローカルLLM", "AIエージェント", "AI開発ツール", "AI論文",
-    "アプリ開発", "LLM", "MCP", "動画編集", "3D",
-    "アバター", "ゲーム開発", "AI画像生成", "AI動画", "オープンソース", "その他",
-]
-
-
-def note_candidate_categories() -> list[str]:
-    preferred = [
-        "企業", "地方自治体", "AI業務自動化", "AIエージェント", "AI開発ツール", "AI論文",
-        "アプリ開発", "ローカルLLM", "AIセキュリティ", "AI教育・研修",
-    ]
-    categories = [
-        *preferred,
-        *NOTE_FALLBACK_CATEGORIES,
-        *[cat for cat in CATEGORY_KEYWORDS.keys() if cat != "その他"],
-        "その他",
-    ]
-    return list(dict.fromkeys(categories))
-
-
-def _idea_target_reader(category: str) -> str:
-    if category == "地方自治体":
-        return "自治体職員 / 行政DX担当者 / 自治体向けに提案する企業担当者"
-    if category in ["企業", "AI業務自動化", "AIセキュリティ", "AI教育・研修"]:
-        return "AIを仕事に活用したいビジネスマン / 企業のDX担当者 / 情報収集担当者"
-    if category in ["AI開発ツール", "アプリ開発", "ゲーム開発", "ローカルLLM", "MCP", "LLM", "AI論文"]:
-        return "AIを実装・開発に活用したい人 / 個人開発者 / 技術情報を追う人"
-    if category in ["AI画像生成", "AI動画", "動画編集", "3D", "アバター", "AI音声", "AI作曲"]:
-        return "AIを制作・発信・業務コンテンツに活用したい人"
-    return "AIの最新情報を効率よく収集している人"
-
-
-def _idea_search_intent(category: str) -> str:
-    if category in ["地方自治体", "AI法規制・著作権", "AIセキュリティ"]:
-        return "導入前に事例、ルール、リスク、公式情報を確認したい"
-    if category in ["企業", "AI業務自動化", "AI教育・研修"]:
-        return "仕事で使える具体例、導入手順、注意点を知りたい"
-    if category == "AI論文":
-        return "最新研究、サーベイ、ベンチマークから実務に関係する示唆を知りたい"
-    if category in ["AI開発ツール", "アプリ開発", "ゲーム開発", "ローカルLLM"]:
-        return "使い方、比較、実装手順、必要環境を知りたい"
-    return "最新ツールの違い、使いどころ、商用利用や注意点を知りたい"
-
-
-def _idea_article_angle(category: str, keywords: str) -> str:
-    if category == "地方自治体":
-        return "デジタル庁や自治体事例を起点に、現場で使う前に確認すべきポイントを整理する"
-    if category == "企業":
-        return "部署別の業務課題とAI導入の現実的な使いどころを結びつける"
-    if category == "AI業務自動化":
-        return "単なるツール紹介ではなく、業務フローをどう変えるかという視点で整理する"
-    if category == "AI画像生成":
-        return "ツール比較だけでなく、商用利用・著作権・制作ワークフローまで含める"
-    if category == "AI論文":
-        return "arXiv論文を専門家向けで終わらせず、何が新しく、仕事や開発にどう関係するかまで翻訳する"
-    return f"{keywords.split('、')[0]}を入口に、背景、使いどころ、注意点を実務目線で整理する"
-
-
-def _idea_outline(category: str) -> str:
-    return "導入：最近の動き → 本文：何が起きたか / なぜ注目か / これまでとの違い / 実務で見るポイント → まとめ：今後見るべき点"
-
-
 def _is_arxiv_article(article: dict) -> bool:
     source_id = str(article.get("source_id", "")).lower()
     source_label = str(article.get("source_label", "")).lower()
     url = _article_url(article).lower()
     return source_id == "arxiv" or "arxiv" in source_label or "arxiv.org" in url
-
-
-def enrich_note_idea(idea: dict, category: str) -> dict:
-    keywords = idea.get("keywords", "")
-    primary_kw = keywords.split("、")[0] if keywords else category
-    enriched = {
-        **idea,
-        "category": idea.get("category") or category,
-        "target_reader": idea.get("target_reader") or _idea_target_reader(category),
-        "title_idea": idea.get("title_idea") or f"{primary_kw}を仕事で見るときのポイント",
-        "search_intent": idea.get("search_intent") or _idea_search_intent(category),
-        "article_angle": idea.get("article_angle") or _idea_article_angle(category, keywords),
-        "outline": idea.get("outline") or _idea_outline(category),
-        "originality_note": idea.get("originality_note") or "単なるニュース紹介ではなく、企業・自治体・情報収集者が次に確認すべき観点まで整理する。",
-    }
-    return enriched
 
 
 def filter_by_category(articles: list[dict], category: str) -> list[dict]:
@@ -1575,494 +1441,6 @@ def render_archive_calendar(archives: list[str], viewing_date: str, today_str: s
     return st.session_state.get("kw_viewing_date", viewing_date)
 
 
-# ── カテゴリ別の note 記事アングル定義 ──────────────────────────
-_NOTE_ANGLES: dict[str, dict[str, str]] = {
-    "GPT": {
-        "needed_info": "OpenAI最新情報・ChatGPTの新機能・プロンプト例・API活用コード",
-        "reader_needs": "ChatGPT新機能をすぐ仕事に使いたい。プロンプトや自動化コードを手に入れて副業・業務効率化に活かしたい。",
-    },
-    "Gemini": {
-        "needed_info": "Google Gemini最新アップデート・AI Studio使い方・NotebookLM活用法",
-        "reader_needs": "Geminiを無料で最大限活用したい。NotebookLM・AI Studioの実践的な使い方を知りたい。",
-    },
-    "Grok": {
-        "needed_info": "xAI Grok最新情報・X連携機能・他モデルとの比較・使いどころ",
-        "reader_needs": "Grokが何に優れているか知りたい。ChatGPT・Claudeとの使い分け方を理解したい。",
-    },
-    "Claude": {
-        "needed_info": "Claude Code実装例・MCP設定方法・Anthropic API活用コード",
-        "reader_needs": "Claude Codeで開発を自動化したい。MCPを使った効率的なワークフローを構築したい。",
-    },
-    "AIエージェント": {
-        "needed_info": "AIエージェント構築手順・LangChain/n8n/Difyの実装コード・自動化フロー設計",
-        "reader_needs": "AIエージェントを自分で作って業務を自動化したい。コードや設定を見ながら実装したい。",
-    },
-    "AI業務自動化": {
-        "needed_info": "n8n・Dify・RPA代替・社内ワークフロー自動化・議事録/メール/資料作成の自動化事例",
-        "reader_needs": "AIを仕事の定型業務に組み込みたい。どの業務を自動化できるか、既存ツールとどう組み合わせるかを知りたい。",
-    },
-    "AI教育・研修": {
-        "needed_info": "生成AI研修カリキュラム・AIリテラシー教育・職種別プロンプト研修・自治体/企業の教育事例",
-        "reader_needs": "社内や自治体でAIを安全に使うための研修内容を知りたい。初心者向けではなく実務に使える教育設計を知りたい。",
-    },
-    "AIセキュリティ": {
-        "needed_info": "情報漏洩対策・プロンプトインジェクション・シャドーAI・AI利用ガイドライン・ガバナンス設計",
-        "reader_needs": "生成AIを安全に導入したい。便利さだけでなく、機密情報や社内ルールのリスクをどう管理するか知りたい。",
-    },
-    "地方自治体": {
-        "needed_info": "デジタル庁・自治体DX・GovTech・生成AIガイドライン・導入事例・窓口/議事録/防災/住民サービス活用",
-        "reader_needs": "自治体でAIをどう使えるか知りたい。安全な導入ルール、他自治体の事例、住民サービスや業務効率化への活かし方を知りたい。",
-    },
-    "企業": {
-        "needed_info": "企業の生成AI導入事例・部署別ユースケース・社内RAG/ナレッジ活用・AIエージェント導入・費用対効果",
-        "reader_needs": "自社や取引先でAIをどう活用できるか知りたい。営業・マーケ・人事・経理・法務・CSなど具体的な業務別の使い方を知りたい。",
-    },
-    "AI開発ツール": {
-        "needed_info": "Cursor・Claude Code・Codex・GitHub Copilot・Gemini Code Assist・Antigravity・OpenClawの比較と実践例",
-        "reader_needs": "AIを使って開発速度を上げたい。ツールの選び方、具体的なワークフロー、実際のコード生成・レビュー方法を知りたい。",
-    },
-    "AI論文": {
-        "needed_info": "今日arXivに新規公開されたAI論文・技術報告・サーベイ論文、提案手法、公開コード、ベンチマーク、データセット、実務転用の可能性",
-        "reader_needs": "最新研究を追いたいが、論文を読む時間が足りない。今日出た研究のうち、AIエージェント、ローカルLLM、MCP、推論効率化、自治体DXや業務活用に関係するものを日本語で理解したい。",
-    },
-    "AI作曲": {
-        "needed_info": "Suno・Udio最新機能・プロンプト例・商用利用の注意点・収益化方法",
-        "reader_needs": "AI作曲を副業・ビジネスにしたい。良い曲を生成するプロンプトの書き方を知りたい。",
-    },
-    "AI画像生成": {
-        "needed_info": "Midjourney・Stable Diffusion・FLUX・Firefly・ComfyUIの比較、商用利用、著作権、制作ワークフロー",
-        "reader_needs": "画像生成AIを仕事や発信に活用したい。ツール選び、商用利用の注意点、実務で使える制作手順を知りたい。",
-    },
-    "AI動画": {
-        "needed_info": "Sora・Runway・Kling等の最新比較・動画生成プロンプト・ビジネス活用事例",
-        "reader_needs": "AI動画生成ツールの使い方と収益化方法を知りたい。コスパの良いツール選びをしたい。",
-    },
-    "動画編集": {
-        "needed_info": "Premiere Pro・DaVinci Resolve・CapCut・Vrew・RunwayなどのAI動画編集機能と時短ワークフロー",
-        "reader_needs": "動画編集をAIで速くしたい。字幕、カット、要約、ショート動画化、B-roll作成を効率化する方法を知りたい。",
-    },
-    "AI音声": {
-        "needed_info": "ElevenLabs・VOICEVOX等の設定方法・音声クローン手順・活用ビジネスモデル",
-        "reader_needs": "AI音声を使ったコンテンツ制作や副業の始め方を知りたい。音声クローンの作り方を学びたい。",
-    },
-    "ローカルLLM": {
-        "needed_info": "Ollama・LM Studio・Open WebUI・llama.cpp・GGUF・ローカルRAG・GPU/メモリ要件・おすすめ日本語モデル",
-        "reader_needs": "クラウドAPIに頼らずローカルでLLMを動かしたい。費用、プライバシー、社内利用、必要スペック、構築手順を知りたい。",
-    },
-    "ゲーム開発": {
-        "needed_info": "Unity・Unreal Engine・GodotでのAIゲーム開発、NPC AI、アセット生成、プロシージャル生成、ゲーム制作ワークフロー",
-        "reader_needs": "AIを使ってゲーム制作を速くしたい。企画、コード、画像・3Dアセット、NPC、レベル制作への使い方を知りたい。",
-    },
-    "アプリ開発": {
-        "needed_info": "生成AIアプリの実装例、Streamlit/Gradio/Next.js/FastAPI、RAGアプリ、チャットボット、業務アプリ開発",
-        "reader_needs": "AIアプリを自分で作りたい。最小構成、技術選定、実装手順、公開方法、収益化の入口を知りたい。",
-    },
-    "3D": {
-        "needed_info": "Meshy・Blender・Unreal Engine・Unity・Luma AI・Gaussian Splatting・text-to-3D・3Dアセット制作",
-        "reader_needs": "AIで3D素材やシーンを作りたい。ツール比較、制作フロー、ゲームや動画への組み込み方法を知りたい。",
-    },
-    "アバター": {
-        "needed_info": "AIアバター、VRM、Live2D、Vroid、HeyGen、D-ID、Synthesia、音声クローン、デジタルヒューマン活用",
-        "reader_needs": "AIアバターで発信や動画制作をしたい。作り方、動かし方、声の付け方、商用利用や注意点を知りたい。",
-    },
-    "LLM": {
-        "needed_info": "最新LLMの性能比較・RAG実装方法・ファインチューニング手順・HuggingFace活用",
-        "reader_needs": "LLMの最前線を把握したい。RAGやFine-tuningを実装して自社サービスに組み込みたい。",
-    },
-    "MCP": {
-        "needed_info": "MCPサーバー構築手順・Claude連携設定・実用的なMCPツール一覧",
-        "reader_needs": "MCPを使ってClaudeをもっと便利にしたい。サーバー構築から連携まで手順で知りたい。",
-    },
-    "ハードウェア": {
-        "needed_info": "AI向けPC・GPU選び方・Raspberry Pi AI構築手順・Mac mini活用法",
-        "reader_needs": "コスパ良くAI環境を構築したい。自宅サーバーやミニPCでローカルAIを動かしたい。",
-    },
-    "オープンソース": {
-        "needed_info": "注目OSSプロジェクト・GitHubリポジトリ・セルフホスト手順・ライセンス確認",
-        "reader_needs": "無料・オープンソースのAIツールを使いこなしたい。商用利用可能なモデルを探している。",
-    },
-    "HuggingFace": {
-        "needed_info": "HuggingFace最新モデル・Spaces活用法・Transformersコード例・safetensors使い方",
-        "reader_needs": "HuggingFaceのモデルを実際のアプリに組み込みたい。最新モデルの入手と使い方を知りたい。",
-    },
-}
-
-
-def _build_llm_prompt(news_articles: list[dict], info_articles: list[dict]) -> str:
-    def fmt(arts: list[dict], n: int) -> str:
-        return "\n".join(
-            f"・{a.get('title','')}\n  {a.get('summary','')[:80]}\n  URL: {a.get('link','')}"
-            for a in arts[:n]
-        )
-    articles_str = (
-        "【AI ニュース】\n" + fmt(news_articles, 25) +
-        "\n\n【AI 情報・ブログ】\n" + fmt(info_articles, 25)
-    )
-    return f"""あなたはAI分野に詳しいnoteクリエイター兼SEO編集者です。
-以下のAIニュース・AI情報を分析し、note記事向けのキーワード案を必ず10個提案してください。
-
-想定読者：
-- AIを仕事に活用したいビジネスマン
-- AIを活用したい地方自治体・行政DX担当者
-- AIの最新情報を効率よく収集している人
-
-選定基準：
-- 最近のトレンド性がある
-- 検索されやすい語句を含む（例：使い方、始め方、導入事例、活用事例、比較、ガイドライン、業務効率化）
-- SEOで狙いやすい2〜4語の複合キーワードにする
-- 実務・自治体・情報収集のどれかに明確な価値がある
-- 企業、地方自治体、ローカルLLM、AIエージェント、AI開発ツールを優先する
-
-各アイデアについて以下のJSON形式のみを出力してください（コードブロック不要）：
-{{
-  "ideas": [
-    {{
-      "category": "カテゴリ名",
-      "keywords": "キーワード1、キーワード2、キーワード3",
-      "target_reader": "想定読者",
-      "title_idea": "note記事タイトル案",
-      "search_intent": "このキーワードで検索する人の意図",
-      "needed_info": "記事に必要な情報・リソース（具体的に）",
-      "reader_needs": "このキーワードで読者が求めていること",
-      "article_angle": "記事化する切り口",
-      "outline": "導入、本文、まとめの構成案",
-      "originality_note": "他の記事と差別化するための観点",
-      "source_urls": ["参考URL1", "参考URL2"]
-    }}
-  ]
-}}
-
-記事リスト:
-{articles_str}"""
-
-
-def generate_note_keywords_ollama(news_articles: list[dict], info_articles: list[dict]) -> list[dict]:
-    """Ollama gemma4 を使って note キーワード案を生成"""
-    raw = _ollama_generate(_build_llm_prompt(news_articles, info_articles), "gemma4")
-    if not raw:
-        return []
-    raw = re.sub(r"```(?:json)?", "", raw).strip("`").strip()
-    m = re.search(r'\{[\s\S]*\}', raw)
-    if not m:
-        return []
-    ideas = json.loads(m.group()).get("ideas", [])
-    out = []
-    for idea in ideas:
-        category = idea.get("category") or "その他"
-        out.append(enrich_note_idea(idea, category))
-    return out
-
-
-def generate_note_keywords_free(news_articles: list[dict], info_articles: list[dict]) -> list[dict]:
-    """API不要・アルゴリズムによるキーワード分析"""
-    from collections import defaultdict
-
-    all_arts = news_articles[:80] + info_articles[:120]
-    # スコアリングで重要度順に並べる
-    scored = sorted(
-        [{**a, "_score": score_article(a, i)} for i, a in enumerate(all_arts)],
-        key=lambda x: x["_score"], reverse=True,
-    )
-
-    # カテゴリ別に記事を割り振る
-    cat_arts: dict[str, list[dict]] = defaultdict(list)
-    for art in scored:
-        text = (art["title"] + " " + art.get("summary", "")).lower()
-        for cat, kws in CATEGORY_KEYWORDS.items():
-            if cat == "その他":
-                continue
-            if cat == "AI論文" and not _is_arxiv_article(art):
-                continue
-            if any(kw in text for kw in kws):
-                cat_arts[cat].append(art)
-
-    # カテゴリ優先度 = 記事件数/注目度 + ペルソナ適合 + SEO検索意図語
-    priority: dict[str, float] = {}
-    for cat, arts in cat_arts.items():
-        if not arts:
-            continue
-        text_blob = " ".join((a["title"] + " " + a.get("summary", "")).lower() for a in arts[:10])
-        avg_score = sum(a.get("_score", 0) for a in arts) / len(arts)
-        seo_hits = sum(1 for kw in SEO_INTENT_KEYWORDS if kw in text_blob)
-        priority[cat] = (
-            len(arts) * avg_score
-            + PERSONA_CATEGORY_WEIGHTS.get(cat, 0)
-            + seo_hits * 8
-        )
-
-    top_cats = sorted(priority, key=lambda c: priority[c], reverse=True)
-    for cat in note_candidate_categories():
-        if cat not in top_cats:
-            top_cats.append(cat)
-    top_cats = top_cats[:NOTE_IDEA_COUNT]
-
-    ideas = []
-    for cat in top_cats:
-        arts = cat_arts[cat][:4]
-        angle = _NOTE_ANGLES.get(cat, {})
-
-        # タイトルから実際に出現したキーワードを抽出
-        titles_text = " ".join(a["title"] for a in arts).lower()
-        found_kws = [kw for kw in CATEGORY_KEYWORDS.get(cat, []) if kw in titles_text and len(kw) >= 2]
-        template = NOTE_KEYWORD_TEMPLATES.get(cat, f"{cat} 使い方、{cat} 活用事例、{cat} 比較")
-        kw_parts = [p.strip() for p in template.split("、") if p.strip()]
-        for kw in found_kws[:2]:
-            if kw not in " ".join(kw_parts):
-                kw_parts.append(kw)
-        kw_str = "、".join(dict.fromkeys(kw_parts[:4]))
-
-        # トップ記事タイトルをキーワードに追加（短い日本語タイトルがあれば）
-        for a in arts:
-            t = a["title"]
-            if len(kw_parts) < 4 and 8 <= len(t) <= 30 and not t.startswith("http"):
-                kw_str = f"{kw_str}、{t[:20]}"
-                break
-
-        source_urls = [a["link"] for a in arts if a.get("link") and a["link"] != "#"][:3]
-
-        ideas.append(enrich_note_idea({
-            "keywords":    kw_str,
-            "needed_info": angle.get("needed_info", f"{cat}関連の最新情報・実装例・活用事例"),
-            "reader_needs": angle.get("reader_needs", f"{cat}を実務で活用する具体的な方法が知りたい"),
-            "source_urls": source_urls,
-            "_method":     "algorithm",
-        }, cat))
-
-    return ideas[:NOTE_IDEA_COUNT]
-
-
-def generate_note_keywords(news_articles: list[dict], info_articles: list[dict]) -> list[dict]:
-    """Ollama gemma4 を優先し、使えない場合だけ無料アルゴリズムに戻す"""
-    try:
-        ideas = generate_note_keywords_ollama(news_articles, info_articles)
-        if ideas:
-            return ideas[:NOTE_IDEA_COUNT]
-    except Exception:
-        pass
-    return generate_note_keywords_free(news_articles, info_articles)
-
-
-def _collect_note_source_materials(idea: dict, max_sources: int = 4) -> list[dict]:
-    materials: list[dict] = []
-    seen: set[str] = set()
-    for url in idea.get("source_urls", []):
-        if not url or url == "#" or url in seen:
-            continue
-        seen.add(url)
-        body = fetch_article_body(url)
-        text = _md_block_text(body.get("text", ""), 4500)
-        materials.append({
-            "url": url,
-            "status": body.get("status", ""),
-            "text": text,
-        })
-        if len(materials) >= max_sources:
-            break
-    return materials
-
-
-def _build_note_article_prompt(idea: dict, materials: list[dict]) -> str:
-    source_blocks = []
-    for idx, material in enumerate(materials, 1):
-        source_blocks.append(f"""### ソース{idx}
-URL: {material.get('url', '')}
-本文取得状況: {material.get('status', '')}
-本文:
-{material.get('text', '')[:3500]}
-""")
-    sources_text = "\n\n".join(source_blocks) or "本文取得できたソースがありません。画面上の企画情報のみを使ってください。"
-    return f"""あなたはnote向けのビジネス記事を書く編集者です。
-以下のAI Noteキーワード企画と、情報元URLから取得した本文をもとに、日本語の記事を作成してください。
-
-厳守条件:
-- 全体で3000字以上10000字以下
-- 10000字を超えそうな場合でも、途中で切らず、内容を自然に整理して最後まで書ききる
-- わかりやすく具体的に、丁寧に略さず書く
-- 読み物として自然に読める文章にする
-- タイトル、導入、本文見出し、まとめを付ける
-- 本文には「思いました」「感じました」などの感想表現を入れない
-- 事実、背景、比較、ビジネス・自治体・実務上の意味を中心に書く
-- 煽りすぎず、note向けだがビジネス寄り
-- 専門用語は必要に応じて短く説明する
-- 箇条書きは多用しない
-- 最後に「## 参考ソース」を置き、URLを列挙する
-- 途中で終わらせず、必ず「まとめ」と「参考ソース」まで書いて完結させる
-
-企画:
-- カテゴリ: {idea.get('category', '')}
-- キーワード: {idea.get('keywords', '')}
-- 想定読者: {idea.get('target_reader', '')}
-- タイトル案: {idea.get('title_idea', '')}
-- 検索意図: {idea.get('search_intent', '')}
-- 必要な情報: {idea.get('needed_info', '')}
-- 読者ニーズ: {idea.get('reader_needs', '')}
-- 切り口: {idea.get('article_angle', '')}
-- 構成案: {idea.get('outline', '')}
-- 独自性メモ: {idea.get('originality_note', '')}
-
-情報元本文:
-{sources_text}
-"""
-
-
-def _fallback_note_article(idea: dict, materials: list[dict]) -> str:
-    urls = [m.get("url", "") for m in materials if m.get("url")]
-    source_lines = "\n".join(f"- {url}" for url in urls) or "- 情報元URLなし"
-    first_source = _md_escape(materials[0].get("text", ""))[:420] if materials else ""
-    title = idea.get("title_idea") or f"{idea.get('keywords', 'AI活用')}を仕事で見るときのポイント"
-    body = f"""# {title}
-
-## 導入
-
-{idea.get('keywords', '生成AI')}に関する情報が増えています。背景には、AIを単なる話題のツールとしてではなく、仕事や自治体業務、情報収集の中でどう使うかを考える段階に入っていることがあります。
-
-この記事では、{idea.get('category', 'AI')}の最新動向をもとに、読者がどこを見ておくべきかを整理します。
-
-## 何が起きているのか
-
-今回のテーマは、{idea.get('article_angle', 'AI活用の流れを実務目線で整理すること')}です。
-
-{first_source or idea.get('needed_info', '')}
-
-## なぜ注目されているのか
-
-読者が求めているのは、単なるニュースの羅列ではありません。{idea.get('reader_needs', '')}
-
-企業や自治体でAIを使う場合、重要なのは「便利そう」だけで判断しないことです。どの業務に入れるのか、どのデータを扱うのか、誰が運用するのか、リスクをどう管理するのかまで見る必要があります。
-
-## 仕事で見るべきポイント
-
-まず確認したいのは、実務で再現できるかどうかです。ツール名や新機能だけではなく、導入手順、必要な情報、費用、セキュリティ、社内ルールとの相性を見ておく必要があります。
-
-自治体の場合は、住民サービス、職員業務、説明責任、個人情報保護の観点が重要になります。企業の場合は、業務効率化、品質管理、顧客対応、ナレッジ共有への影響を見ると判断しやすくなります。
-
-## 導入前に確認したいこと
-
-このテーマを記事にする場合、まず確認したいのは一次情報です。公式発表、提供元の説明、料金、対象ユーザー、利用条件、商用利用の可否を押さえることで、読者が自分の状況に置き換えやすくなります。
-
-次に、既存業務との接点を整理します。AIツールは単体で便利でも、実際には社内データ、承認フロー、セキュリティルール、担当者のスキルと組み合わせて使うことになります。特に企業や自治体では、誰が使うのか、どの情報を入力してよいのか、出力結果を誰が確認するのかを決めておく必要があります。
-
-また、似たツールや既存の方法との違いも重要です。新しいAI機能が出たときは、従来より何が速くなるのか、品質が上がるのか、コストが下がるのか、運用が簡単になるのかを比較すると、単なる紹介記事ではなく判断材料として読まれやすくなります。
-
-## 記事として深掘りできる観点
-
-記事では、読者がすぐに使えるように「どんな場面で役立つか」を具体化すると読みやすくなります。たとえば、情報収集、資料作成、問い合わせ対応、開発、動画制作、研修、ガイドライン作成など、実際の業務名に落とし込むことで、読者は自分の仕事と結びつけて理解できます。
-
-さらに、メリットだけでなく注意点も書くと信頼性が上がります。生成AIは便利ですが、入力データの扱い、著作権、誤情報、社内ルール、説明責任といった論点があります。これらを避けずに整理することで、ビジネス寄りの記事として読み応えが出ます。
-
-## まとめ
-
-今回のテーマは、単なるAIニュースではなく、AIを実務の中でどう扱うかという流れにつながっています。
-
-今後は、新しいツールを追うだけでなく、導入事例、公式情報、運用ルール、現場での使われ方をセットで見ておくことが重要になります。
-
-## 参考ソース
-
-{source_lines}
-"""
-    return _enforce_draft_length(body, 10000)
-
-
-def build_note_keyword_article(idea: dict, materials: list[dict]) -> str:
-    prompt = _build_note_article_prompt(idea, materials)
-    generated = _ollama_generate(prompt, "gemma4", num_predict=7200)
-    urls = [m.get("url", "") for m in materials if m.get("url")]
-    source_tail = "## 参考ソース\n\n" + ("\n".join(f"- {url}" for url in urls) if urls else "- 情報元URLなし")
-    if generated and len(generated) >= 2500:
-        completed = _complete_ollama_draft(generated, prompt, "## 参考ソース", source_tail)
-        return _enforce_draft_length(completed, 10000)
-    return _fallback_note_article(idea, materials)
-
-
-def _note_keyword_source_markdown(idea: dict, materials: list[dict], today: str, idx: int) -> str:
-    source_lines = "\n".join(
-        f"- {m.get('url', '')}（{m.get('status', '')}）"
-        for m in materials
-    ) or "- 情報元URLなし"
-    source_bodies = "\n\n".join(
-        f"""### ソース{i}
-- URL：{m.get('url', '')}
-- 本文取得状況：{m.get('status', '')}
-
-{m.get('text', '') or '本文を取得できませんでした。'}
-"""
-        for i, m in enumerate(materials, 1)
-    ) or "本文を取得できる情報元URLがありませんでした。"
-    return f"""---
-type: ai_note_keyword_source
-created: {today}
-category: {idea.get('category', '')}
-keywords: {idea.get('keywords', '')}
-status: source
----
-
-# AI Note キーワード企画・ソース #{idx}
-
-## 企画メモ
-
-- カテゴリ：{idea.get('category', '')}
-- キーワード：{idea.get('keywords', '')}
-- 想定読者：{idea.get('target_reader', '')}
-- タイトル案：{idea.get('title_idea', '')}
-- 検索意図：{idea.get('search_intent', '')}
-- 必要な情報・リソース：{idea.get('needed_info', '')}
-- 読み手が求めていること：{idea.get('reader_needs', '')}
-- 記事化する切り口：{idea.get('article_angle', '')}
-- 構成案：{idea.get('outline', '')}
-- 独自性メモ：{idea.get('originality_note', '')}
-
-## 情報元URLと本文取得状況
-
-{source_lines}
-
-## 情報元本文
-
-{source_bodies}
-"""
-
-
-def _note_keyword_draft_markdown(idea: dict, article_body: str, source_path: Path, today: str, idx: int, base_dir: Path) -> str:
-    return f"""---
-type: ai_note_keyword_draft
-created: {today}
-category: {idea.get('category', '')}
-keywords: {idea.get('keywords', '')}
-status: draft
-source_file: {_relative_obsidian_path(source_path, base_dir)}
----
-
-{article_body}
-
-## 使用したソースMarkdown
-
-- {_source_markdown_line(source_path, base_dir)}
-"""
-
-
-def write_note_keyword_articles(ideas: list[dict], today: str, base_dir: Path = OBSIDIAN_VAULT_DIR, progress_cb=None) -> list[Path]:
-    ensure_obsidian_vault(base_dir)
-    source_root = _date_folder(base_dir / "05_AInotekeyword_Sources", today)
-    draft_root = _date_folder(base_dir / "06_AInotekeyword_Drafts", today)
-    source_root.mkdir(parents=True, exist_ok=True)
-    draft_root.mkdir(parents=True, exist_ok=True)
-    written: list[Path] = []
-    selected_ideas = ideas[:NOTE_IDEA_COUNT]
-    total = max(1, len(selected_ideas))
-    for idx, raw_idea in enumerate(selected_ideas, 1):
-        if progress_cb:
-            progress_cb(idx, total, f"AI Note原稿生成中: {idx}/{total}")
-        idea = enrich_note_idea(raw_idea, raw_idea.get("category") or "その他")
-        materials = _collect_note_source_materials(idea)
-        article_body = build_note_keyword_article(idea, materials)
-        title = _safe_filename(idea.get("title_idea") or idea.get("keywords") or f"note_keyword_{idx}", 70)
-        source_path = source_root / f"{idx:02d}_{title}_source.md"
-        draft_path = draft_root / f"{idx:02d}_{title}.md"
-        source_path.write_text(_note_keyword_source_markdown(idea, materials, today, idx), encoding="utf-8")
-        draft_path.write_text(_note_keyword_draft_markdown(idea, article_body, source_path, today, idx, base_dir), encoding="utf-8")
-        written.extend([source_path, draft_path])
-    return written
-
-
 # ─────────────────────────────────────────────
 #  Obsidian 出力
 # ─────────────────────────────────────────────
@@ -2073,8 +1451,20 @@ OBSIDIAN_DIRS = [
     "02_Theme_Summaries",
     "03_Article_Drafts",
     "04_Published",
+    "05_fact",
+    "06_hypothesis",
+    "07_trend",
+    "08_article",
+    "09_AI_Note",
+    "10_arXiv",
+    "11_Logs",
     "99_Templates",
 ]
+
+# 段階的に検証できるよう、Obsidian出力は現在この段階まで実行する。
+# 1: 本文取得・除外判定・01_News_Sources保存・11_Logs保存
+# 7: fact/hypothesis/trend/AI Note/article/arXiv/閲覧まで実行
+OBSIDIAN_EXPORT_STAGE = 7
 
 OBSIDIAN_CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "AIエージェント": [
@@ -2319,7 +1709,74 @@ def fetch_article_body(url: str) -> dict:
         return {"text": "", "status": f"本文取得失敗: {type(exc).__name__}"}
 
 
-def enrich_articles_with_body(articles: list[dict], progress_cb=None) -> list[dict]:
+def _new_obsidian_log() -> dict[str, list[dict]]:
+    return {
+        "summary": [],
+        "body_fetch_failed": [],
+        "excluded_articles": [],
+        "unclassified_articles": [],
+        "generation_errors": [],
+        "ollama_errors": [],
+        "generated_files": [],
+    }
+
+
+def _log_event(logs: dict | None, section: str, **kwargs) -> None:
+    if logs is None:
+        return
+    logs.setdefault(section, []).append({
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        **kwargs,
+    })
+
+
+def _quality_exclusion_reason(article: dict, deep: bool = False) -> str:
+    title = article.get("title", "").lower()
+    summary = article.get("summary", "").lower()
+    url = _article_url(article).lower()
+    source = _article_source(article).lower()
+    combined = title + " " + summary
+    if deep and ("note.com" in url or "note" in source):
+        body = fetch_article_body(_article_url(article)).get("text", "")
+        combined = f"{combined} {body[:3500].lower()}"
+
+    for kw in EXCLUDE_TITLE_KEYWORDS:
+        if kw in title:
+            return f"除外タイトルキーワード: {kw}"
+
+    for pattern in EXCLUDE_REGEX_PATTERNS:
+        if re.search(pattern, combined):
+            return f"除外パターン一致: {pattern}"
+
+    weak_personal_markers = [
+        "今日は", "最近思う", "ふと思った", "日記", "雑記", "ただのメモ",
+        "書いてみました", "作ってみました", "使ってみました",
+        "小説", "物語", "ポエム", "詩", "俳句", "短歌",
+    ]
+    practical_markers = [
+        "導入", "活用事例", "業務", "自治体", "企業", "開発", "実装",
+        "比較", "検証", "料金", "ガイドライン", "セキュリティ", "api",
+        "github", "oss", "ローカルllm", "n8n", "dify", "rag",
+    ]
+    if any(marker in combined for marker in weak_personal_markers):
+        if not any(marker in combined for marker in practical_markers):
+            return "日記・ポエム・小説生成・薄い体験談と判断"
+
+    beginner_markers = [
+        "初心者", "超初心者", "入門", "始め方", "はじめ方",
+        "アカウント作成", "登録方法", "ログイン方法",
+    ]
+    if any(marker in combined for marker in beginner_markers):
+        if not any(marker in combined for marker in ["企業", "自治体", "研修", "教育", "ガイドライン", "セキュリティ", "導入"]):
+            return "初心者向けすぎる入門記事と判断"
+
+    if len(_md_escape(article.get("summary", ""))) < 35 and not _is_arxiv_article(article):
+        return "要約が短く内容が薄い記事と判断"
+
+    return ""
+
+
+def enrich_articles_with_body(articles: list[dict], progress_cb=None, logs: dict | None = None) -> list[dict]:
     enriched: list[dict] = []
     total = max(1, len(articles))
     for idx, article in enumerate(articles, 1):
@@ -2333,7 +1790,74 @@ def enrich_articles_with_body(articles: list[dict], progress_cb=None) -> list[di
             "full_text": full_text,
             "content_status": body.get("status", ""),
         })
+        status = body.get("status", "")
+        if not full_text or status.startswith("本文取得失敗") or status in {"URLなし"} or status.startswith("HTML以外"):
+            _log_event(
+                logs,
+                "body_fetch_failed",
+                title=article.get("title", ""),
+                url=url,
+                source=_article_source(article),
+                reason=status or "本文なし",
+            )
     return enriched
+
+
+def _post_body_exclusion_reason(article: dict) -> str:
+    if _is_arxiv_article(article) or _is_primary_source(article):
+        return ""
+    full_text = _md_block_text(article.get("full_text", ""), 1000)
+    summary = _md_escape(article.get("summary", ""))
+    status = _article_content_status(article)
+    if not full_text and len(summary) < 140:
+        return f"本文取得不可かつ判断材料が少なすぎる: {status}"
+    if status.startswith("本文取得失敗") and len(summary) < 220:
+        return f"本文取得失敗で参考情報不足: {status}"
+    if status.startswith("HTML以外") and len(summary) < 220:
+        return f"HTML本文を取得できず参考情報不足: {status}"
+    return ""
+
+
+def _obsidian_tag_metadata(article: dict, main_category: str, themes: list[str]) -> dict[str, list[str]]:
+    text = _article_text_for_classification(article).lower()
+    vendor_terms = {
+        "OpenAI": ["openai", "chatgpt", "gpt", "codex"],
+        "Anthropic": ["anthropic", "claude"],
+        "Google": ["google", "gemini", "deepmind", "notebooklm", "antigravity"],
+        "xAI": ["xai", "grok"],
+        "Microsoft": ["microsoft", "copilot", "azure"],
+        "Meta": ["meta", "llama"],
+        "NVIDIA": ["nvidia", "gpu", "cuda"],
+        "HuggingFace": ["huggingface", "hugging face"],
+        "Ollama": ["ollama"],
+        "Runway": ["runway"],
+        "Suno": ["suno"],
+        "Udio": ["udio"],
+        "ElevenLabs": ["elevenlabs", "eleven labs"],
+        "Blender": ["blender"],
+        "Unreal Engine": ["unreal engine", "ue5"],
+        "Unity": ["unity"],
+        "Meshy": ["meshy"],
+    }
+    vendors = [name for name, kws in vendor_terms.items() if any(kw in text for kw in kws)]
+    technologies = [main_category, *themes]
+    applications = [cat for cat in ["企業", "地方自治体", "AI業務自動化", "ゲーム開発", "アプリ開発", "AI教育・研修"] if cat in themes or cat == main_category]
+    keyword_candidates = [
+        "Codex", "Claude Code", "MCP", "RAG", "ローカルLLM", "AIエージェント",
+        "AIコーディング", "AI画像生成", "AI動画", "AI音声", "アバター",
+        "量子化", "推論高速化", "Knowledge Graph", "GPU", "NPU",
+    ]
+    keywords = [kw for kw in keyword_candidates if kw.lower() in text or kw in main_category or kw in themes]
+    return {
+        "vendor": list(dict.fromkeys(vendors)) or ["未特定"],
+        "technology": list(dict.fromkeys([t for t in technologies if t]))[:6],
+        "application": list(dict.fromkeys(applications)) or ["未特定"],
+        "keywords": list(dict.fromkeys(keywords))[:8],
+    }
+
+
+def _yaml_list(values: list[str]) -> str:
+    return "[" + ", ".join(str(v).replace("[", "").replace("]", "") for v in values if v) + "]"
 
 
 def _is_primary_source(article: dict) -> bool:
@@ -2627,10 +2151,146 @@ seo_keywords:
 
 ## 参考リンク
 """,
+        "fact_template.md": """---
+type: fact
+source:
+url:
+created:
+category:
+---
+
+# {{title}}
+
+## 確認できる事実
+
+- 誰が：
+- いつ：
+- 何を：
+- 何が変わったか：
+- 関連する機能・技術・製品：
+
+## 根拠
+
+- ソースMarkdown：
+- URL：
+
+## 禁止事項
+
+このファイルには推測、感想、考察を書かない。
+""",
+        "hypothesis_template.md": """---
+type: hypothesis
+created:
+theme:
+status: working
+---
+
+# {{theme}} 仮説
+
+## 仮説
+
+〇〇の可能性がある。
+
+## 根拠となるfact
+
+- 
+
+## 追加で確認したいこと
+
+- 
+
+## 注意
+
+断定しない。必ず「可能性がある」「考えられる」などの推測表現を使う。
+""",
+        "trend_template.md": """---
+type: trend
+theme:
+updated:
+status: active
+---
+
+# {{theme}} トレンド
+
+## 長期トレンド
+
+## 追記ログ
+
+### YYYY-MM-DD
+
+- 
+
+## 関連fact
+
+- 
+
+## 関連まとめ
+
+- 
+""",
+        "arxiv_template.md": """---
+type: arxiv_paper
+created:
+category: AI論文
+source: arXiv
+url:
+---
+
+# {{title}}
+
+## 基本情報
+
+- 公開日：
+- URL：
+- arXivカテゴリ：
+- 関連テーマ：
+
+## 要約
+
+## 技術的に何が新しいか
+
+## 実務・企業・自治体で応用できそうな点
+
+## 注意点・未確認事項
+
+## 本文抜粋
+""",
+        "ai_note_template.md": """---
+type: ai_note
+created:
+status: draft
+---
+
+# AI Note 原稿
+
+## 使用した素材
+
+## 原稿
+
+## 参考ソース
+""",
+        "log_template.md": """---
+type: obsidian_export_log
+created:
+---
+
+# Obsidian出力ログ
+
+## 本文取得失敗URL
+
+## 除外した記事
+
+## 分類不能記事
+
+## 生成エラー
+
+## Ollamaエラー
+""",
     }
     for filename, body in templates.items():
         path = base_dir / "99_Templates" / filename
-        path.write_text(body, encoding="utf-8")
+        if not path.exists():
+            path.write_text(body, encoding="utf-8")
 
     published_path = base_dir / "04_Published" / "note投稿済み.md"
     if not published_path.exists():
@@ -2763,12 +2423,26 @@ def _news_item_block(article: dict, idx: int, collected_date: str) -> str:
     date = _md_escape(_article_date(article))
     main_category, themes = _classify_obsidian_article(article)
     theme_text = " / ".join(themes)
+    meta = _obsidian_tag_metadata(article, main_category, themes)
     source_type = _article_type(article)
     importance = _importance_label(article)
     readers = _target_readers(themes)
     analysis = _article_analysis(article, main_category)
     angles = "\n".join(f"- {line}" for line in _article_angle_lines(article, themes))
-    return f"""# {title}
+    return f"""---
+type: news_item
+created: {collected_date}
+main_category: {main_category}
+vendor: {_yaml_list(meta['vendor'])}
+technology: {_yaml_list(meta['technology'])}
+application: {_yaml_list(meta['application'])}
+keywords: {_yaml_list(meta['keywords'])}
+url: {url}
+source: {source}
+content_status: {_article_content_status(article)}
+---
+
+# {title}
 
 ## 基本情報
 - 日付：{date}
@@ -2781,6 +2455,10 @@ def _news_item_block(article: dict, idx: int, collected_date: str) -> str:
 - 重要度：{importance}
 - 本文取得状況：{_article_content_status(article)}
 - 想定読者：{readers}
+- vendor：{" / ".join(meta['vendor'])}
+- technology：{" / ".join(meta['technology'])}
+- application：{" / ".join(meta['application'])}
+- keywords：{" / ".join(meta['keywords'])}
 
 ## 要約
 
@@ -2838,36 +2516,16 @@ def _news_item_inline_block(article: dict, idx: int) -> str:
 
 
 def _write_category_sources(base_dir: Path, grouped: dict[str, list[dict]], today: str) -> list[Path]:
-    written: list[Path] = []
-    day_root = _date_folder(base_dir / "01_News_Sources", today)
-    for category, articles in grouped.items():
-        category_dir = day_root / _safe_filename(category)
-        category_dir.mkdir(parents=True, exist_ok=True)
-        path = category_dir / f"_index_{_safe_filename(category)}.md"
-        body = [
-            "---",
-            "type: news_source",
-            f"category: {category}",
-            f"date: {today}",
-            "status: collected",
-            "---",
-            "",
-            f"# {today} {category}",
-            "",
-            f"収集件数: {len(articles)}",
-            "",
-        ]
-        body.extend(_news_item_inline_block(a, i) for i, a in enumerate(articles[:30], 1))
-        path.write_text("\n".join(body), encoding="utf-8")
-        written.append(path)
-    return written
+    # 01_News_Sources は「1記事1Markdown」を原則にするため、カテゴリ別indexは作らない。
+    return []
 
 
-def _write_individual_news_items(base_dir: Path, grouped: dict[str, list[dict]], today: str) -> tuple[list[Path], dict[str, list[Path]]]:
+def _write_individual_news_items(base_dir: Path, grouped: dict[str, list[dict]], today: str) -> tuple[list[Path], dict[str, list[Path]], dict[str, Path]]:
     written: list[Path] = []
     by_category: dict[str, list[Path]] = {}
+    by_url: dict[str, Path] = {}
     seen_urls: set[str] = set()
-    day_root = _date_folder(base_dir / "01_News_Sources", today)
+    day_root = _flat_date_folder(base_dir / "01_News_Sources", today)
     for category, articles in grouped.items():
         category_dir = day_root / _safe_filename(category)
         category_dir.mkdir(parents=True, exist_ok=True)
@@ -2881,7 +2539,8 @@ def _write_individual_news_items(base_dir: Path, grouped: dict[str, list[dict]],
             path.write_text(_news_item_block(article, 1, today), encoding="utf-8")
             written.append(path)
             by_category.setdefault(category, []).append(path)
-    return written, by_category
+            by_url[url] = path
+    return written, by_category, by_url
 
 
 def _relative_obsidian_path(path: Path, base_dir: Path = OBSIDIAN_VAULT_DIR) -> str:
@@ -2903,18 +2562,43 @@ def _date_folder(parent: Path, date_text: str) -> Path:
     return parent / _safe_filename(date_text)
 
 
+def _flat_date_folder(parent: Path, date_text: str) -> Path:
+    return parent / _safe_filename(date_text)
+
+
 def _build_theme_summary(category: str, articles: list[dict], today: str, source_paths: list[Path], base_dir: Path) -> str:
     top_articles = articles[:8]
     description = OBSIDIAN_CATEGORY_DESCRIPTIONS.get(
         category,
         f"{category} に関するニュース・事例・ツールを集約するページ。",
     )
-    recent_flow = "\n".join(
-        f"- {_md_escape(a.get('title', 'タイトルなし'))}"
-        for a in top_articles[:5]
-    )
+    usable, reference, exclude = [], [], []
+    for article in top_articles:
+        status = _article_content_status(article)
+        score = score_article(article, 0)
+        if article.get("full_text") and score >= 25:
+            usable.append(article)
+        elif article.get("full_text") or _is_primary_source(article) or _is_arxiv_article(article):
+            reference.append(article)
+        else:
+            exclude.append(article)
+
+    def source_list(items: list[dict], label: str) -> str:
+        if not items:
+            return "- なし"
+        rows = []
+        for i, article in enumerate(items[:8]):
+            source_md = source_paths[i] if i < len(source_paths) else None
+            rows.append(
+                f"- {label}: {_md_escape(article.get('title', 'タイトルなし'))}\n"
+                f"  - 理由：{_summarize_article_text(article, 180)}\n"
+                f"  - 本文取得状況：{_article_content_status(article)}\n"
+                f"  - ソースMarkdown：{_source_markdown_line(source_md, base_dir) if source_md else '未作成'}"
+            )
+        return "\n".join(rows)
+
     related_blocks = []
-    for i, article in enumerate(top_articles):
+    for i, article in enumerate(top_articles[:6]):
         source_md = source_paths[i] if i < len(source_paths) else None
         related_blocks.append(f"""### {_md_escape(_article_date(article))} {_md_escape(article.get('title', 'タイトルなし'))}
 - {_summarize_article_text(article, 360)}
@@ -2925,6 +2609,9 @@ def _build_theme_summary(category: str, articles: list[dict], today: str, source
 - ソースMarkdown：{_source_markdown_line(source_md, base_dir) if source_md else '未作成'}
 """)
     related_news = "\n\n".join(related_blocks)
+    trend_hint = f"{category}に関する同種の動きが複数確認できる場合、07_trend/{_safe_filename(category)}.md の更新候補です。"
+    x_posts = "\n".join(f"- {category}: {_summarize_article_text(a, 110)}" for a in usable[:4]) or "- まだ投稿候補は少ない"
+    note_judgement = "記事化候補あり" if usable else ("参考情報として保留" if reference else "除外寄り")
     seo = "\n".join(f"- {kw}" for kw in _seo_candidates([category]))
     source_lines = "\n".join(
         f"- {_source_markdown_line(path, base_dir)}"
@@ -2942,13 +2629,29 @@ updated: {today}
 
 {description}
 
-## 最近の流れ
-
-{recent_flow or '- まだ十分なニュースがありません'}
-
-## 関連ニュース
+## このテーマで起きていること
 
 {related_news or '関連ニュースはまだありません。'}
+
+## 共通して見える流れ
+
+- {category}に関する情報が複数出ている場合、単発ニュースではなく運用・導入・制作フローの変化として見る。
+- 本文取得済みのソースを優先し、タイトルや冒頭だけで判断しない。
+- 企業・自治体・開発者・情報発信者のどの読者に役立つかを分けて整理する。
+
+## ソース分類
+
+### 1. 記事化に使えるソース
+
+{source_list(usable, '採用')}
+
+### 2. 参考程度のソース
+
+{source_list(reference, '参考')}
+
+### 3. 除外した方がよいソース
+
+{source_list(exclude, '除外候補')}
 
 ## 記事化できる切り口
 
@@ -2956,9 +2659,18 @@ updated: {today}
 - 導入事例、公式発表、ツール紹介を比較して、実務で使う前の判断材料にする
 - 技術の新規性だけでなく、業務フロー・ガイドライン・運用設計への影響を見る
 
-## 仕事・自治体活用への示唆
+## X投稿ネタ候補
 
-{category} は、単体のニュースとして読むだけでなく、業務効率化、情報収集、住民サービス、社内ルール整備などの文脈で見ると記事化しやすくなります。
+{x_posts}
+
+## note記事化判定
+
+- 判定：{note_judgement}
+- 理由：本文取得済みで、複数ソースから共通する変化が見えるほど記事化しやすい。
+
+## trend更新候補
+
+{trend_hint}
 
 ## SEO候補
 
@@ -2976,7 +2688,7 @@ updated: {today}
 
 def _write_theme_summaries(base_dir: Path, grouped: dict[str, list[dict]], today: str, source_map: dict[str, list[Path]]) -> list[Path]:
     written: list[Path] = []
-    day_root = _date_folder(base_dir / "02_Theme_Summaries", today)
+    day_root = _flat_date_folder(base_dir / "02_Theme_Summaries", today)
     day_root.mkdir(parents=True, exist_ok=True)
     ranked = sorted(
         grouped.items(),
@@ -3098,7 +2810,7 @@ def _ollama_generate(prompt: str, model: str = "gemma4", num_predict: int = 3600
 def _build_llm_draft_prompt(category: str, summary_text: str, source_lines: str) -> str:
     clipped_summary = summary_text[:7000]
     return f"""あなたはnote向けのビジネス記事を書く編集者です。
-以下のテーマ別まとめMarkdownをもとに、日本語の記事ドラフトを作ってください。
+以下の素材Markdownをもとに、日本語の記事ドラフトを作ってください。
 
 条件:
 - 全体で3000字以上10000字以下
@@ -3119,9 +2831,21 @@ def _build_llm_draft_prompt(category: str, summary_text: str, source_lines: str)
 ソース一覧:
 {source_lines}
 
-テーマ別まとめMarkdown:
+素材Markdown:
 {clipped_summary}
 """
+
+
+def _read_joined(paths: list[Path], max_chars: int = 12000) -> str:
+    chunks = []
+    for path in paths:
+        try:
+            chunks.append(f"\n\n# SOURCE: {_relative_obsidian_path(path)}\n" + path.read_text(encoding="utf-8")[:3000])
+        except Exception:
+            continue
+        if sum(len(c) for c in chunks) >= max_chars:
+            break
+    return "\n".join(chunks)[:max_chars]
 
 
 def _build_rule_based_draft(category: str, summary_path: Path, source_paths: list[Path], today: str, base_dir: Path) -> str:
@@ -3210,7 +2934,8 @@ seo_keywords: {', '.join(_seo_candidates([category]))}
     return _enforce_draft_length(draft)
 
 
-def _build_article_draft_from_summary(category: str, summary_path: Path, source_paths: list[Path], today: str, base_dir: Path, use_ollama: bool = True) -> str:
+def _build_article_draft_from_summary(category: str, summary_path: Path, source_paths: list[Path], today: str, base_dir: Path, use_ollama: bool = True, extra_sources: list[Path] | None = None) -> str:
+    extra_sources = extra_sources or []
     fallback = _build_rule_based_draft(category, summary_path, source_paths, today, base_dir)
     if not use_ollama:
         return fallback
@@ -3218,7 +2943,7 @@ def _build_article_draft_from_summary(category: str, summary_path: Path, source_
         f"- {_source_markdown_line(path, base_dir)}"
         for path in [summary_path, *source_paths[:12]]
     )
-    summary_text = summary_path.read_text(encoding="utf-8") if summary_path.exists() else ""
+    summary_text = (summary_path.read_text(encoding="utf-8") if summary_path.exists() else "") + _read_joined(extra_sources, 10000)
     prompt = _build_llm_draft_prompt(category, summary_text, source_lines)
     generated = _ollama_generate(prompt, "gemma4", num_predict=7200)
     if not generated or len(generated) < 2500:
@@ -3228,20 +2953,466 @@ def _build_article_draft_from_summary(category: str, summary_path: Path, source_
     return _enforce_draft_length(completed)
 
 
-def _write_article_drafts_from_summaries(base_dir: Path, summary_files: list[Path], source_map: dict[str, list[Path]], today: str, use_ollama: bool = True) -> list[Path]:
+def _write_article_drafts_from_summaries(base_dir: Path, summary_files: list[Path], source_map: dict[str, list[Path]], today: str, use_ollama: bool = True, fact_map: dict[str, list[Path]] | None = None, hypothesis_files: list[Path] | None = None, ai_note_files: list[Path] | None = None) -> list[Path]:
     written: list[Path] = []
-    day_root = _date_folder(base_dir / "03_Article_Drafts", today)
+    day_root = _flat_date_folder(base_dir / "03_Article_Drafts", today)
     day_root.mkdir(parents=True, exist_ok=True)
     for idx, summary_path in enumerate(summary_files[:10], 1):
         category = summary_path.stem
         title = _safe_filename(f"{category}の最新動向とビジネスで見るべきポイント", 60)
         path = day_root / f"{idx:02d}_{title}.md"
+        trend_path = base_dir / "07_trend" / f"{_safe_filename(category)}.md"
+        extra = []
+        extra.extend((fact_map or {}).get(category, [])[:8])
+        extra.extend(hypothesis_files or [])
+        extra.extend(ai_note_files or [])
+        if trend_path.exists():
+            extra.append(trend_path)
         path.write_text(
-            _build_article_draft_from_summary(category, summary_path, source_map.get(category, []), today, base_dir, use_ollama),
+            _build_article_draft_from_summary(category, summary_path, source_map.get(category, []), today, base_dir, use_ollama, extra_sources=extra),
             encoding="utf-8",
         )
         written.append(path)
     return written
+
+
+def _ollama_fact_extract(article: dict, main_category: str, logs: dict | None = None) -> dict:
+    text = _article_full_text(article)
+    if not text:
+        return {}
+    prompt = f"""以下の記事本文から、確認できる事実だけを抽出してください。
+JSONのみで返してください。
+
+禁止:
+- 推測、感想、考察を書かない
+- 本文にない内容を補わない
+- 「重要」「注目」など評価語を使わない
+
+返すJSON:
+{{"who":"誰が", "when":"いつ", "what":"何を発表・公開・実施したか", "change":"何が変わったか", "product":"関連する機能・技術・製品", "facts":["本文から確認できる事実1","本文から確認できる事実2"]}}
+
+タイトル: {_md_escape(article.get('title', ''))}
+URL: {_article_url(article)}
+カテゴリ: {main_category}
+本文:
+{text[:7000]}
+"""
+    raw = _ollama_generate(prompt, "gemma4", num_predict=1800)
+    if not raw:
+        _log_event(logs, "ollama_errors", step="fact抽出", title=article.get("title", ""), url=_article_url(article), reason="Ollama応答なし")
+        return {}
+    raw = re.sub(r"```(?:json)?", "", raw).strip("`").strip()
+    m = re.search(r"\{[\s\S]*\}", raw)
+    if not m:
+        _log_event(logs, "generation_errors", step="fact抽出JSON解析", title=article.get("title", ""), url=_article_url(article), reason="JSONなし")
+        return {}
+    try:
+        data = json.loads(m.group())
+    except Exception as exc:
+        _log_event(logs, "generation_errors", step="fact抽出JSON解析", title=article.get("title", ""), url=_article_url(article), reason=type(exc).__name__)
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _fact_markdown(article: dict, today: str, source_path: Path | None, base_dir: Path, logs: dict | None = None) -> str:
+    main_category, themes = _classify_obsidian_article(article)
+    meta = _obsidian_tag_metadata(article, main_category, themes)
+    data = _ollama_fact_extract(article, main_category, logs)
+    title = _md_escape(article.get("title", "タイトルなし"))
+    source_line = _source_markdown_line(source_path, base_dir) if source_path else "未作成"
+    facts = data.get("facts") if isinstance(data.get("facts"), list) else []
+    if not facts:
+        facts = [
+            f"出典「{_article_source(article)}」で「{title}」という情報が公開されています。",
+            f"URLは {_article_url(article)} です。",
+            f"カテゴリは {main_category} と判定されています。",
+        ]
+    fact_lines = "\n".join(f"- {_md_escape(fact)}" for fact in facts[:8])
+    return f"""---
+type: fact
+source: {_md_escape(_article_source(article))}
+url: {_article_url(article)}
+created: {today}
+category: {main_category}
+vendor: {_yaml_list(meta['vendor'])}
+technology: {_yaml_list(meta['technology'])}
+application: {_yaml_list(meta['application'])}
+keywords: {_yaml_list(meta['keywords'])}
+---
+
+# {title}
+
+## 確認できる事実
+
+- 誰が：{_md_escape(data.get('who') or _article_source(article))}
+- いつ：{_md_escape(data.get('when') or _article_date(article))}
+- 何を：{_md_escape(data.get('what') or title)}
+- 何が変わったか：{_md_escape(data.get('change') or '本文から明確に確認できる変更点は追加確認が必要です')}
+- 関連する機能・技術・製品：{_md_escape(data.get('product') or '未特定')}
+- vendor：{" / ".join(meta['vendor'])}
+- technology：{" / ".join(meta['technology'])}
+- application：{" / ".join(meta['application'])}
+- keywords：{" / ".join(meta['keywords'])}
+
+## 本文から確認できる事実
+
+{fact_lines}
+
+## 根拠
+
+- ソースMarkdown：{source_line}
+- URL：{_article_url(article)}
+- 出典：{_md_escape(_article_source(article))}
+- 本文取得状況：{_article_content_status(article)}
+
+## 禁止事項
+
+このファイルには推測、感想、考察を書かない。
+"""
+
+
+def _write_fact_files(base_dir: Path, articles: list[dict], today: str, source_by_url: dict[str, Path], logs: dict | None = None) -> tuple[list[Path], dict[str, list[Path]]]:
+    written: list[Path] = []
+    by_category: dict[str, list[Path]] = {}
+    day_root = _flat_date_folder(base_dir / "05_fact", today)
+    day_root.mkdir(parents=True, exist_ok=True)
+    seen: set[str] = set()
+    for article in articles[:100]:
+        url = _article_url(article)
+        if url in seen:
+            continue
+        seen.add(url)
+        category, _themes = _classify_obsidian_article(article)
+        category_dir = day_root / _safe_filename(category)
+        category_dir.mkdir(parents=True, exist_ok=True)
+        title = _safe_filename(article.get("title", "fact"), 70)
+        path = category_dir / f"{title}.md"
+        path.write_text(_fact_markdown(article, today, source_by_url.get(url), base_dir, logs), encoding="utf-8")
+        written.append(path)
+        by_category.setdefault(category, []).append(path)
+    return written, by_category
+
+
+def _write_hypothesis_files(base_dir: Path, fact_map: dict[str, list[Path]], today: str) -> list[Path]:
+    written: list[Path] = []
+    day_root = _flat_date_folder(base_dir / "06_hypothesis", today)
+    day_root.mkdir(parents=True, exist_ok=True)
+    for category, paths in sorted(fact_map.items(), key=lambda x: len(x[1]), reverse=True)[:12]:
+        fact_lines = "\n".join(f"- {_source_markdown_line(path, base_dir)}" for path in paths[:10])
+        path = day_root / f"{_safe_filename(category)}_hypothesis.md"
+        path.write_text(f"""---
+type: hypothesis
+created: {today}
+theme: {category}
+status: working
+---
+
+# {category} 仮説
+
+## 仮説
+
+{category}に関する複数の事実から、今後この領域の導入・検証・情報発信が増える可能性がある。
+
+企業や自治体では、単発のニュースとして見るだけでなく、業務フロー、ガイドライン、費用対効果、運用体制と結びつけて検討する必要が出てくると考えられる。
+
+## 根拠となるfact
+
+{fact_lines or '- まだfactがありません'}
+
+## 追加で確認したいこと
+
+- 公式発表や一次情報があるか
+- 実際の導入事例や利用条件が確認できるか
+- 企業・自治体で使う場合の制約やリスクがあるか
+
+## 注意
+
+このファイルはfactをもとにした仮説です。断定は禁止し、「可能性がある」「考えられる」という前提で扱います。
+""", encoding="utf-8")
+        written.append(path)
+    return written
+
+
+def _append_trend_files(base_dir: Path, grouped: dict[str, list[dict]], today: str, fact_map: dict[str, list[Path]], summary_files: list[Path]) -> list[Path]:
+    written: list[Path] = []
+    trend_root = base_dir / "07_trend"
+    trend_root.mkdir(parents=True, exist_ok=True)
+    log_root = _flat_date_folder(base_dir / "11_Logs", today) / "trend_updates"
+    log_root.mkdir(parents=True, exist_ok=True)
+    summary_map = {path.stem: path for path in summary_files}
+    for category, articles in sorted(grouped.items(), key=lambda x: len(x[1]), reverse=True)[:14]:
+        path = trend_root / f"{_safe_filename(category)}.md"
+        if path.exists():
+            current = path.read_text(encoding="utf-8")
+        else:
+            current = f"""---
+type: trend
+theme: {category}
+updated: {today}
+status: active
+---
+
+# {category} トレンド
+
+## 長期トレンド
+
+{OBSIDIAN_CATEGORY_DESCRIPTIONS.get(category, category + 'に関する長期トレンドを保存するページ。')}
+"""
+        article_lines = "\n".join(f"- {_md_escape(a.get('title', 'タイトルなし'))}（{_article_source(a)}）" for a in articles[:6])
+        fact_lines = "\n".join(f"- {_source_markdown_line(p, base_dir)}" for p in fact_map.get(category, [])[:8])
+        summary_line = f"- {_source_markdown_line(summary_map[category], base_dir)}" if category in summary_map else "- 未作成"
+        observation_count = current.count("### 観測") + current.count("#### 今日確認した動き") + len(articles)
+        trend_level = "主要トレンド" if observation_count >= 10 else ("継続トレンド" if observation_count >= 3 else "新規/観測中")
+        prompt = f"""既存のトレンドMarkdownと今日の材料を読み、テーマごとの長期トレンドとして整理し直してください。
+
+条件:
+- 単純追記は禁止
+- 既存トレンドを補強 / 修正 / 新規トレンド / ノイズ のどれかを判断する
+- 同じ傾向が3回以上なら継続トレンド、10回以上なら主要トレンドとして扱う
+- Markdownで返す
+- 根拠factリンクと関連まとめリンクを残す
+
+テーマ: {category}
+トレンド状態: {trend_level}
+
+既存trend:
+{current[:8000]}
+
+今日確認した動き:
+{article_lines}
+
+関連fact:
+{fact_lines}
+
+関連まとめ:
+{summary_line}
+"""
+        updated = _ollama_generate(prompt, "gemma4", num_predict=4200)
+        if not updated:
+            updated = f"""{current.rstrip()}
+
+## {today} 更新
+
+### 判断
+
+既存トレンドを補強する可能性がある。
+
+### 今日確認した動き
+
+{article_lines or '- なし'}
+
+### 関連fact
+
+{fact_lines or '- なし'}
+
+### 関連まとめ
+
+{summary_line}
+"""
+        path.write_text(updated.strip(), encoding="utf-8")
+        log_path = log_root / f"{today}_{_safe_filename(category)}_trend_update.md"
+        log_path.write_text(f"""---
+type: trend_update
+created: {today}
+theme: {category}
+trend_level: {trend_level}
+---
+
+# {category} trend更新判断ログ
+
+## 判断
+
+- 判定：{trend_level}
+- 観測数目安：{observation_count}
+- 更新方針：既存トレンドを読み込み、今日の材料で補強・修正・新規・ノイズを判定して再整理
+
+## 今日確認した動き
+
+{article_lines or '- なし'}
+
+## 関連fact
+
+{fact_lines or '- なし'}
+
+## 関連まとめ
+
+{summary_line}
+""", encoding="utf-8")
+        written.append(path)
+    return written
+
+
+def _write_candidate_articles(base_dir: Path, draft_files: list[Path], today: str) -> list[Path]:
+    written: list[Path] = []
+    day_root = base_dir / "08_article"
+    day_root.mkdir(parents=True, exist_ok=True)
+    for idx, draft_path in enumerate(draft_files[:8], 1):
+        try:
+            text = draft_path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        title = _safe_filename(draft_path.stem, 70)
+        path = day_root / f"{today}_{idx:02d}_{title}.md"
+        path.write_text(text.replace("status: draft", "status: candidate"), encoding="utf-8")
+        written.append(path)
+    return written
+
+
+def _write_arxiv_files(base_dir: Path, articles: list[dict], today: str, logs: dict | None = None) -> list[Path]:
+    written: list[Path] = []
+    day_root = _flat_date_folder(base_dir / "10_arXiv", today)
+    day_root.mkdir(parents=True, exist_ok=True)
+    for idx, article in enumerate([a for a in articles if _is_arxiv_article(a)][:40], 1):
+        title = _md_escape(article.get("title", "arXiv paper"))
+        category, themes = _classify_obsidian_article(article)
+        analysis = _article_analysis(article, "AI論文")
+        path = day_root / f"{idx:02d}_{_safe_filename(title, 80)}.md"
+        path.write_text(f"""---
+type: arxiv_paper
+created: {today}
+category: AI論文
+source: arXiv
+url: {_article_url(article)}
+---
+
+# {title}
+
+## 基本情報
+
+- 公開日：{_article_date(article)}
+- URL：{_article_url(article)}
+- arXivカテゴリ：{_md_escape(article.get('source_label') or 'arXiv')}
+- 関連テーマ：{' / '.join(themes)}
+- 本文取得状況：{_article_content_status(article)}
+
+## 要約
+
+{analysis.get('summary') or _summarize_article_text(article, 500)}
+
+## 技術的に何が新しいか
+
+{analysis.get('what_happened') or '本文から確認できる技術的な新規性は追加確認が必要です。'}
+
+## 実務・企業・自治体で応用できそうな点
+
+{analysis.get('why_important') or '実務応用の可能性は、関連分野と公開コード、評価条件を確認して判断する必要があります。'}
+
+## 注意点・未確認事項
+
+- 査読前のプレプリントである可能性があります。
+- 実装コード、ライセンス、データセット、評価条件は一次情報で確認してください。
+- 今日新しく公開・更新されたarXiv項目のみを対象にしています。
+
+## 本文抜粋
+
+{_article_full_text(article)[:3500] or _md_escape(article.get('summary', ''))}
+""", encoding="utf-8")
+        written.append(path)
+    return written
+
+
+def _build_ai_note_source(base_dir: Path, today: str, summary_files: list[Path], fact_files: list[Path], arxiv_files: list[Path]) -> str:
+    lines = ["---", "type: ai_note_source", f"created: {today}", "---", "", f"# {today} AI Note ソース", ""]
+    lines.append("## テーマ別まとめ")
+    lines.extend(f"- {_source_markdown_line(path, base_dir)}" for path in summary_files[:12])
+    lines.append("\n## fact")
+    lines.extend(f"- {_source_markdown_line(path, base_dir)}" for path in fact_files[:20])
+    lines.append("\n## arXiv")
+    lines.extend(f"- {_source_markdown_line(path, base_dir)}" for path in arxiv_files[:12])
+    lines.append("\n## 関連trend")
+    trend_root = base_dir / "07_trend"
+    if trend_root.exists():
+        lines.extend(f"- {_source_markdown_line(path, base_dir)}" for path in sorted(trend_root.glob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True)[:12])
+    return "\n".join(lines)
+
+
+def _build_ai_note_article(source_text: str, today: str, logs: dict | None = None) -> str:
+    prompt = f"""以下のAIニュース素材をもとに、note向けのビジネス寄り記事を1本作成してください。
+
+条件:
+- AI Noteキーワードは作らない
+- 1500字以上6000字以下
+- 途中で切らず最後まで書く
+- 以下の見出しを必ず含める
+  - 今日の注目テーマ
+  - 今日起きたこと
+  - 今日見えた変化
+  - X投稿ネタ候補
+  - note記事ネタ候補
+  - 関連trend
+  - 使用ソース一覧
+- 本文では感想表現を使わず、事実、背景、比較、ビジネス・自治体での意味を中心に書く
+
+日付: {today}
+素材:
+{source_text[:9000]}
+"""
+    generated = _ollama_generate(prompt, "gemma4", num_predict=7200)
+    if not generated:
+        _log_event(logs, "ollama_errors", step="AI Note原稿生成", reason="Ollama応答なし")
+        generated = f"""# {today} のAIニュースから見る実務活用の流れ
+
+## 導入
+
+今日のAI関連情報では、技術開発、企業活用、自治体活用、AI論文など複数の動きが確認できます。個別のニュースを追うだけでは流れが見えにくいため、素材をまとめて見ることで、仕事や行政でどのような変化が起きているのかを整理できます。
+
+## 本文
+
+AI活用は、単なるツール紹介から、業務フローや情報管理、開発体制、教育、セキュリティを含む運用設計へ広がっています。企業では業務効率化や社内ナレッジ活用、自治体では住民サービスや職員業務の改善が主な論点になります。
+
+## まとめ
+
+今後は新しいツール名だけでなく、どの現場で使えるのか、どの情報を扱うのか、どのルールで運用するのかを見ることが重要になります。
+
+## 使用したソース
+
+{source_text[:2500]}
+"""
+    tail = "## 使用ソース一覧\n\n" + source_text[:4000]
+    return _complete_ollama_draft(generated, prompt, "## 使用ソース一覧", tail)
+
+
+def _write_ai_note_files(base_dir: Path, today: str, summary_files: list[Path], fact_files: list[Path], arxiv_files: list[Path], logs: dict | None = None) -> list[Path]:
+    written: list[Path] = []
+    day_root = _flat_date_folder(base_dir / "09_AI_Note", today)
+    day_root.mkdir(parents=True, exist_ok=True)
+    source_text = _build_ai_note_source(base_dir, today, summary_files, fact_files, arxiv_files)
+    source_path = day_root / f"AI_Note_Source_{today}.md"
+    draft_path = day_root / f"AI_Note_{today}.md"
+    source_path.write_text(source_text, encoding="utf-8")
+    draft_path.write_text(_build_ai_note_article(source_text, today, logs), encoding="utf-8")
+    written.extend([source_path, draft_path])
+    return written
+
+
+def _write_export_log(base_dir: Path, today: str, logs: dict) -> Path:
+    day_root = _flat_date_folder(base_dir / "11_Logs", today)
+    day_root.mkdir(parents=True, exist_ok=True)
+    path = day_root / f"{datetime.now().strftime('%H%M%S')}_obsidian_export_log.md"
+    def section(title: str, key: str) -> str:
+        items = logs.get(key, [])
+        if not items:
+            return f"## {title}\n\n- なし\n"
+        body = []
+        for item in items:
+            body.append("\n".join(f"- {k}: {v}" for k, v in item.items()))
+        return f"## {title}\n\n" + "\n\n".join(body) + "\n"
+    path.write_text(f"""---
+type: obsidian_export_log
+created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+---
+
+# Obsidian出力ログ {today}
+
+{section('実行サマリー', 'summary')}
+{section('本文取得失敗URL', 'body_fetch_failed')}
+{section('除外した記事', 'excluded_articles')}
+{section('分類不能記事', 'unclassified_articles')}
+{section('生成エラー', 'generation_errors')}
+{section('Ollamaエラー', 'ollama_errors')}
+{section('生成されたファイル一覧', 'generated_files')}
+""", encoding="utf-8")
+    return path
 
 
 def export_obsidian_pipeline(base_dir: Path = OBSIDIAN_VAULT_DIR, use_ollama: bool = True, progress_cb=None) -> dict:
@@ -3249,22 +3420,56 @@ def export_obsidian_pipeline(base_dir: Path = OBSIDIAN_VAULT_DIR, use_ollama: bo
         if progress_cb:
             progress_cb(percent, message)
 
+    logs = _new_obsidian_log()
     update(3, "Obsidianフォルダを確認中…")
     ensure_obsidian_vault(base_dir)
     today = datetime.now().strftime("%Y-%m-%d")
     update(8, "AIニュースを収集中…")
     news_articles = fetch_news_articles("生成AI OR AI OR 人工知能", "ja", "JP")
+    filtered_news: list[dict] = []
+    for article in news_articles:
+        reason = _quality_exclusion_reason(article, deep=False)
+        if reason:
+            _log_event(
+                logs,
+                "excluded_articles",
+                title=article.get("title", ""),
+                url=_article_url(article),
+                source=_article_source(article),
+                reason=reason,
+            )
+        else:
+            filtered_news.append(article)
     update(18, "AI情報を収集中…")
-    info_articles = get_info_articles([src["id"] for src in INFO_SOURCES], deep=True)
-    combined_articles = news_articles + info_articles
+    info_articles = get_info_articles_for_obsidian([src["id"] for src in INFO_SOURCES], logs=logs)
+    combined_articles = filtered_news + info_articles
 
     def body_progress(idx: int, total: int, message: str):
         pct = 22 + int((idx / max(1, total)) * 28)
         update(min(50, pct), f"{message} / リンク先本文を確認しています")
 
-    all_articles = enrich_articles_with_body(combined_articles, progress_cb=body_progress)
+    all_articles = enrich_articles_with_body(combined_articles, progress_cb=body_progress, logs=logs)
+    accepted_articles: list[dict] = []
+    for article in all_articles:
+        reason = _post_body_exclusion_reason(article)
+        if reason:
+            _log_event(
+                logs,
+                "excluded_articles",
+                title=article.get("title", ""),
+                url=_article_url(article),
+                source=_article_source(article),
+                reason=reason,
+            )
+        else:
+            accepted_articles.append(article)
+    all_articles = accepted_articles
     update(53, "カテゴリ分類中…")
     grouped = _categorized_articles(all_articles)
+    for article in all_articles:
+        category, _themes = _classify_obsidian_article(article)
+        if not category:
+            _log_event(logs, "unclassified_articles", title=article.get("title", ""), url=_article_url(article), reason="カテゴリ未判定")
 
     update(58, "Inbox Markdownを作成中…")
     inbox_path = base_dir / "00_Inbox" / "未整理ニュース.md"
@@ -3285,30 +3490,126 @@ def export_obsidian_pipeline(base_dir: Path = OBSIDIAN_VAULT_DIR, use_ollama: bo
     update(64, "カテゴリ別Markdownを作成中…")
     source_files = _write_category_sources(base_dir, grouped, today)
     update(70, "ニュース個別Markdownを作成中…")
-    item_files, source_map = _write_individual_news_items(base_dir, grouped, today)
-    update(76, "テーマ別まとめMarkdownを作成中…")
+    item_files, source_map, source_by_url = _write_individual_news_items(base_dir, grouped, today)
+    for path in [*source_files, *item_files]:
+        _log_event(logs, "generated_files", type="news_source", path=_relative_obsidian_path(path, base_dir))
+
+    if OBSIDIAN_EXPORT_STAGE <= 1:
+        update(95, "第1段階ログを保存中…")
+        _log_event(
+            logs,
+            "summary",
+            stage="第1段階",
+            collected=len(combined_articles),
+            accepted=len(all_articles),
+            excluded=len(logs.get("excluded_articles", [])),
+            body_fetch_failed=len(logs.get("body_fetch_failed", [])),
+            generated_files=len(source_files) + len(item_files),
+        )
+        log_path = _write_export_log(base_dir, today, logs)
+        _log_event(logs, "generated_files", type="log", path=_relative_obsidian_path(log_path, base_dir))
+        log_path.write_text(log_path.read_text(encoding="utf-8"), encoding="utf-8")
+        update(100, "第1段階のObsidian出力が完了しました。")
+        return {
+            "base_dir": str(base_dir),
+            "stage": OBSIDIAN_EXPORT_STAGE,
+            "news_count": len(filtered_news),
+            "info_count": len(info_articles),
+            "body_fetched_count": sum(1 for a in all_articles if a.get("full_text")),
+            "category_count": len(grouped),
+            "source_files": len(source_files),
+            "item_files": len(item_files),
+            "fact_files": 0,
+            "hypothesis_files": 0,
+            "summary_files": 0,
+            "trend_files": 0,
+            "draft_files": 0,
+            "article_files": 0,
+            "arxiv_files": 0,
+            "ai_note_files": 0,
+            "log_files": 1,
+            "excluded_count": len(logs.get("excluded_articles", [])),
+            "body_failed_count": len(logs.get("body_fetch_failed", [])),
+            "draft_method": "第1段階: 本文取得・除外判定・ニュース保存・ログ保存",
+            "inbox": str(inbox_path),
+            "log": str(log_path),
+        }
+
+    update(74, "fact Markdownを作成中…")
+    fact_files, fact_map = _write_fact_files(base_dir, all_articles, today, source_by_url, logs)
+    update(78, "仮説Markdownを作成中…")
+    hypothesis_files = _write_hypothesis_files(base_dir, fact_map, today)
+    update(81, "テーマ別まとめMarkdownを作成中…")
     summary_files = _write_theme_summaries(base_dir, grouped, today, source_map)
-    update(88, "note記事ドラフトを生成中…")
-    draft_files = _write_article_drafts_from_summaries(base_dir, summary_files, source_map, today, use_ollama)
+    update(85, "長期トレンドを更新中…")
+    trend_files = _append_trend_files(base_dir, grouped, today, fact_map, summary_files)
+    update(89, "今日のarXiv論文を保存中…")
+    arxiv_files = _write_arxiv_files(base_dir, all_articles, today, logs)
+    update(92, "AI Note原稿とソースを保存中…")
+    ai_note_files = _write_ai_note_files(base_dir, today, summary_files, fact_files, arxiv_files, logs)
+    update(95, "note記事ドラフトを生成中…")
+    draft_files = _write_article_drafts_from_summaries(base_dir, summary_files, source_map, today, use_ollama, fact_map=fact_map, hypothesis_files=hypothesis_files, ai_note_files=ai_note_files)
+    update(97, "完成候補記事を保存中…")
+    article_files = _write_candidate_articles(base_dir, draft_files, today)
+    update(99, "処理ログを保存中…")
+    for typ, paths in [
+        ("fact", fact_files),
+        ("hypothesis", hypothesis_files),
+        ("theme_summary", summary_files),
+        ("trend", trend_files),
+        ("arxiv", arxiv_files),
+        ("ai_note", ai_note_files),
+        ("article_draft", draft_files),
+        ("article", article_files),
+    ]:
+        for path in paths:
+            _log_event(logs, "generated_files", type=typ, path=_relative_obsidian_path(path, base_dir))
+    _log_event(
+        logs,
+        "summary",
+        stage="第7段階",
+        collected=len(combined_articles),
+        accepted=len(all_articles),
+        excluded=len(logs.get("excluded_articles", [])),
+        body_fetch_failed=len(logs.get("body_fetch_failed", [])),
+        generated_files=len(logs.get("generated_files", [])),
+    )
+    log_path = _write_export_log(base_dir, today, logs)
     update(100, "Obsidian出力が完了しました。")
 
     return {
         "base_dir": str(base_dir),
-        "news_count": len(news_articles),
+        "news_count": len(filtered_news),
         "info_count": len(info_articles),
         "body_fetched_count": sum(1 for a in all_articles if a.get("full_text")),
         "category_count": len(grouped),
         "source_files": len(source_files),
         "item_files": len(item_files),
+        "fact_files": len(fact_files),
+        "hypothesis_files": len(hypothesis_files),
         "summary_files": len(summary_files),
+        "trend_files": len(trend_files),
         "draft_files": len(draft_files),
+        "article_files": len(article_files),
+        "arxiv_files": len(arxiv_files),
+        "ai_note_files": len(ai_note_files),
+        "log_files": 1,
+        "excluded_count": len(logs.get("excluded_articles", [])),
+        "body_failed_count": len(logs.get("body_fetch_failed", [])),
         "draft_method": "Ollama gemma4（未接続時のみルール生成へ自動退避）",
         "inbox": str(inbox_path),
+        "log": str(log_path),
     }
 
 
 def _obsidian_date_options(base_dir: Path = OBSIDIAN_VAULT_DIR) -> list[str]:
     roots = [
+        base_dir / "09_AI_Note",
+        base_dir / "10_arXiv",
+        base_dir / "11_Logs",
+        base_dir / "08_article",
+        base_dir / "06_hypothesis",
+        base_dir / "05_fact",
         base_dir / "03_Article_Drafts",
         base_dir / "02_Theme_Summaries",
         base_dir / "01_News_Sources",
@@ -3317,6 +3618,9 @@ def _obsidian_date_options(base_dir: Path = OBSIDIAN_VAULT_DIR) -> list[str]:
     for root in roots:
         if not root.exists():
             continue
+        for day_dir in root.iterdir():
+            if day_dir.is_dir() and re.fullmatch(r"\d{4}-\d{2}-\d{2}", day_dir.name):
+                dates.add(day_dir.name)
         for year_dir in root.iterdir():
             if not year_dir.is_dir() or not re.fullmatch(r"\d{4}", year_dir.name):
                 continue
@@ -3331,6 +3635,13 @@ def _obsidian_date_options(base_dir: Path = OBSIDIAN_VAULT_DIR) -> list[str]:
 
 def _obsidian_files_for_view(base_dir: Path, section: str, date_text: str) -> list[Path]:
     section_dirs = {
+        "AI Note": "09_AI_Note",
+        "arXiv": "10_arXiv",
+        "ログ": "11_Logs",
+        "完成候補記事": "08_article",
+        "トレンド": "07_trend",
+        "仮説": "06_hypothesis",
+        "fact": "05_fact",
         "記事ドラフト": "03_Article_Drafts",
         "テーマ別まとめ": "02_Theme_Summaries",
         "ニュースソース": "01_News_Sources",
@@ -3340,7 +3651,13 @@ def _obsidian_files_for_view(base_dir: Path, section: str, date_text: str) -> li
     if section == "Inbox":
         path = base_dir / folder / "未整理ニュース.md"
         return [path] if path.exists() else []
-    root = _date_folder(base_dir / folder, date_text)
+    if section in {"トレンド", "完成候補記事"}:
+        root = base_dir / folder
+        return sorted(root.rglob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True) if root.exists() else []
+    if section in {"AI Note", "arXiv", "ログ", "仮説", "fact", "ニュースソース", "テーマ別まとめ", "記事ドラフト"}:
+        root = _flat_date_folder(base_dir / folder, date_text)
+    else:
+        root = _date_folder(base_dir / folder, date_text)
     if not root.exists():
         return []
     return sorted(root.rglob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True)
@@ -3356,48 +3673,7 @@ def _read_markdown_preview(path: Path, max_chars: int = 14000) -> str:
 
 def is_quality_article(article: dict, deep: bool = False) -> bool:
     """エンタメ系・浅い入門記事をフィルタリング"""
-    title   = article["title"].lower()
-    summary = article["summary"].lower()
-    url = _article_url(article).lower()
-    source = _article_source(article).lower()
-    combined = title + " " + summary
-    if deep and ("note.com" in url or "note" in source):
-        body = fetch_article_body(_article_url(article)).get("text", "")
-        combined = f"{combined} {body[:3500].lower()}"
-
-    # ── ハード除外（タイトルにキーワードが含まれる） ──
-    for kw in EXCLUDE_TITLE_KEYWORDS:
-        if kw in title:
-            return False
-
-    # ── 正規表現パターン除外 ──
-    for pattern in EXCLUDE_REGEX_PATTERNS:
-        if re.search(pattern, combined):
-            return False
-
-    weak_personal_markers = [
-        "今日は", "最近思う", "ふと思った", "日記", "雑記", "ただのメモ",
-        "書いてみました", "作ってみました", "使ってみました",
-        "小説", "物語", "ポエム", "詩", "俳句", "短歌",
-    ]
-    practical_markers = [
-        "導入", "活用事例", "業務", "自治体", "企業", "開発", "実装",
-        "比較", "検証", "料金", "ガイドライン", "セキュリティ", "api",
-        "github", "oss", "ローカルllm", "n8n", "dify", "rag",
-    ]
-    if any(marker in combined for marker in weak_personal_markers):
-        if not any(marker in combined for marker in practical_markers):
-            return False
-
-    beginner_markers = [
-        "初心者", "超初心者", "入門", "始め方", "はじめ方",
-        "アカウント作成", "登録方法", "ログイン方法",
-    ]
-    if any(marker in combined for marker in beginner_markers):
-        if not any(marker in combined for marker in ["企業", "自治体", "研修", "教育", "ガイドライン", "セキュリティ", "導入"]):
-            return False
-
-    return True
+    return not _quality_exclusion_reason(article, deep=deep)
 
 
 def get_info_articles(selected_ids: list[str], deep: bool = False) -> list[dict]:
@@ -3437,6 +3713,58 @@ def get_info_articles(selected_ids: list[str], deep: bool = False) -> list[dict]
                 if link not in seen and is_quality_article(art, deep=deep):
                     seen.add(link)
                     all_art.append(art)
+
+    all_art.sort(key=lambda x: x.get("ts", 0), reverse=True)
+    return all_art
+
+
+def get_info_articles_for_obsidian(selected_ids: list[str], logs: dict | None = None) -> list[dict]:
+    all_art, seen = [], set()
+    fetch_limit = INFO_DEEP_LIMIT
+    tasks = []
+    for src in INFO_SOURCES:
+        if src["id"] not in selected_ids:
+            continue
+        kw = dict(sid=src["id"], slabel=src["label"],
+                  scolor=src["color"], sbg=src["bg"], sicon=src["icon"])
+        if src["type"] == "rss":
+            urls = src.get("urls", [])
+        elif src["type"] == "google":
+            qs = src.get("queries") or ([src["query"]] if src.get("query") else [])
+            urls = [build_rss_url(q, "ja", "JP") for q in qs]
+        else:
+            urls = []
+        for url in urls:
+            tasks.append((url, kw))
+
+    with ThreadPoolExecutor(max_workers=INFO_FETCH_WORKERS) as executor:
+        future_map = {
+            executor.submit(_fetch_rss_url, url, limit=fetch_limit, **kw): url
+            for url, kw in tasks
+        }
+        for future in as_completed(future_map):
+            try:
+                articles = future.result()
+            except Exception as exc:
+                _log_event(logs, "generation_errors", step="AI情報RSS取得", reason=type(exc).__name__)
+                continue
+            for art in articles:
+                link = art.get("link")
+                if not link or link in seen:
+                    continue
+                reason = _quality_exclusion_reason(art, deep=True)
+                if reason:
+                    _log_event(
+                        logs,
+                        "excluded_articles",
+                        title=art.get("title", ""),
+                        url=link,
+                        source=_article_source(art),
+                        reason=reason,
+                    )
+                    continue
+                seen.add(link)
+                all_art.append(art)
 
     all_art.sort(key=lambda x: x.get("ts", 0), reverse=True)
     return all_art
@@ -4007,174 +4335,6 @@ elif nav_page == "info":
 
 
 # ═══════════════════════════════════════════════
-#  メインコンテンツ：キーワードページ
-# ═══════════════════════════════════════════════
-elif nav_page == "keywords":
-
-    render_hero("AI Note キーワード提案", "Writer's Eye · Practical · Business · Daily", "📝")
-
-    today_str   = datetime.now().strftime("%Y-%m-%d")
-    today_label = datetime.now().strftime("%Y年%m月%d日")
-
-    col_info, col_refresh3 = st.columns([5, 1])
-    with col_info:
-        st.markdown(f'<div class="search-badge">📅 &nbsp;{today_str} の分析</div>', unsafe_allow_html=True)
-    with col_refresh3:
-        if st.button("🔄 再生成", key="kw_regen"):
-            p = _archive_path(today_str)
-            if p.exists():
-                p.unlink()
-            st.rerun()
-
-    render_divider()
-
-    # ── アーカイブ一覧（過去の日付チップ） ──
-    archives = list_archives()
-    viewing_date = st.session_state.get("kw_viewing_date", today_str)
-
-    if archives:
-        st.markdown('<p style="font-size:0.72rem; color:#5a4030; letter-spacing:0.10em; margin-bottom:8px;">📅 &nbsp;アーカイブカレンダー</p>', unsafe_allow_html=True)
-        viewing_date = render_archive_calendar(archives, viewing_date, today_str)
-        render_divider()
-        viewing_date = st.session_state.get("kw_viewing_date", today_str)
-
-    # ── 表示する分析データを取得 or 生成 ──
-    analysis_data = load_analysis(viewing_date)
-
-    if analysis_data:
-        # 保存済みデータを表示
-        ideas       = analysis_data.get("ideas", [])
-        saved_at    = analysis_data.get("saved_at", viewing_date)
-        st.markdown(
-            f'<div style="text-align:right; margin-bottom:16px;">'
-            f'<span class="kw-date-badge">🕐 {saved_at} 生成</span></div>',
-            unsafe_allow_html=True,
-        )
-        for idx, idea in enumerate(ideas, 1):
-            idea = enrich_note_idea(idea, idea.get("category") or "その他")
-            urls_html = "".join(
-                f'<li><a href="{u}" target="_blank">{u}</a></li>'
-                for u in idea.get("source_urls", []) if u
-            )
-            st.markdown(f"""
-<div class="kw-idea-card">
-  <div class="kw-idea-header">
-    <div class="kw-idea-number">#{idx}</div>
-    <div>
-      <div class="kw-idea-keywords-label">Note 記事キーワード</div>
-      <div class="kw-idea-keywords">「{idea.get('keywords', '')}」</div>
-    </div>
-  </div>
-  <div class="kw-idea-body">
-    <div class="kw-section-title">② カテゴリ / 想定読者</div>
-    <div class="kw-text">{idea.get('category', '')} ｜ {idea.get('target_reader', '')}</div>
-    <div class="kw-section-title">③ タイトル案</div>
-    <div class="kw-text">{idea.get('title_idea', '')}</div>
-    <div class="kw-section-title">④ 検索意図</div>
-    <div class="kw-text">{idea.get('search_intent', '')}</div>
-    <div class="kw-section-title">⑤ 必要な情報・リソース</div>
-    <div class="kw-text">{idea.get('needed_info', '')}</div>
-    <div class="kw-section-title">⑥ 読み手が求めていること</div>
-    <div class="kw-text">{idea.get('reader_needs', '')}</div>
-    <div class="kw-section-title">⑦ 記事化する切り口</div>
-    <div class="kw-text">{idea.get('article_angle', '')}</div>
-    <div class="kw-section-title">⑧ 構成案</div>
-    <div class="kw-text">{idea.get('outline', '')}</div>
-    <div class="kw-section-title">⑨ 独自性メモ</div>
-    <div class="kw-text">{idea.get('originality_note', '')}</div>
-    <div class="kw-section-title">⑩ 情報元 URL</div>
-    <ul class="kw-url-list">{urls_html if urls_html else '<li style="color:#5a4030;font-size:0.74rem;">—</li>'}</ul>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-    elif viewing_date != today_str:
-        st.warning(f"{viewing_date} の分析データが見つかりません。")
-
-    else:
-        # 今日のデータがない → ボタンで生成
-        method_label = "Ollama gemma4（無料・ローカル生成）"
-        st.markdown(f"""
-<div class="kw-gen-area">
-  <div class="kw-gen-msg">
-    今日の分析がまだありません。<br>
-    <span style="color:#c9a96e;">分析方法：{method_label}</span>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-        if st.button("✦ 今日のキーワードを10個生成する", key="kw_generate", use_container_width=True):
-            progress_bar = st.progress(0)
-            progress_text = st.empty()
-
-            def update_kw_progress(percent: int, message: str):
-                progress_bar.progress(max(0, min(100, percent)))
-                progress_text.markdown(f"<div class='kw-text'>進捗 {percent}%｜{message}</div>", unsafe_allow_html=True)
-
-            update_kw_progress(3, "準備中…")
-            with st.spinner("Ollama gemma4で記事を収集・分析中…"):
-                try:
-                    update_kw_progress(10, "AIニュースを収集中…")
-                    n_arts = fetch_news_articles("生成AI OR AI OR 人工知能", "ja", "JP")
-                    update_kw_progress(25, "AI情報を収集中…")
-                    i_arts = get_info_articles([src["id"] for src in INFO_SOURCES], deep=True)
-                    update_kw_progress(45, "キーワード候補を分析中…")
-                    ideas  = generate_note_keywords(n_arts, i_arts)
-                    if ideas:
-                        saved_at = datetime.now().strftime("%Y-%m-%d %H:%M")
-                        def note_progress(idx: int, total: int, message: str):
-                            pct = 58 + int((idx / max(1, total)) * 38)
-                            update_kw_progress(min(96, pct), message)
-
-                        note_files = write_note_keyword_articles(ideas, today_str, OBSIDIAN_VAULT_DIR, progress_cb=note_progress)
-                        save_analysis(today_str, {"saved_at": saved_at, "ideas": ideas})
-                        update_kw_progress(100, "AI Noteキーワードと原稿の保存が完了しました。")
-                        st.success(f"AI Noteソース/原稿Markdownを {len(note_files)} 件保存しました。")
-                        st.session_state["kw_viewing_date"] = today_str
-                        st.rerun()
-                    else:
-                        update_kw_progress(55, "分析結果が空でした。ルール分析に切り替えます…")
-                        st.error("分析結果が空でした。アルゴリズム分析に切り替えます。")
-                        ideas = generate_note_keywords_free(n_arts, i_arts)
-                        if ideas:
-                            saved_at = datetime.now().strftime("%Y-%m-%d %H:%M")
-                            def fallback_note_progress(idx: int, total: int, message: str):
-                                pct = 62 + int((idx / max(1, total)) * 34)
-                                update_kw_progress(min(96, pct), message)
-
-                            note_files = write_note_keyword_articles(ideas, today_str, OBSIDIAN_VAULT_DIR, progress_cb=fallback_note_progress)
-                            save_analysis(today_str, {"saved_at": saved_at, "ideas": ideas})
-                            update_kw_progress(100, "AI Noteキーワードと原稿の保存が完了しました。")
-                            st.success(f"AI Noteソース/原稿Markdownを {len(note_files)} 件保存しました。")
-                            st.session_state["kw_viewing_date"] = today_str
-                            st.rerun()
-                except Exception as e:
-                    update_kw_progress(55, "Ollama分析に失敗しました。ルール分析に切り替えます…")
-                    st.error(f"エラー詳細: {e}")
-                    st.info("Ollamaに接続できないため、アルゴリズム分析に切り替えます…")
-                    try:
-                        update_kw_progress(62, "AIニュースを再確認中…")
-                        n_arts = fetch_news_articles("生成AI OR AI OR 人工知能", "ja", "JP")
-                        update_kw_progress(70, "AI情報を再確認中…")
-                        i_arts = get_info_articles([src["id"] for src in INFO_SOURCES], deep=True)
-                        update_kw_progress(78, "ルール分析でキーワードを生成中…")
-                        ideas  = generate_note_keywords_free(n_arts, i_arts)
-                        if ideas:
-                            saved_at = datetime.now().strftime("%Y-%m-%d %H:%M")
-                            def fallback_note_progress2(idx: int, total: int, message: str):
-                                pct = 82 + int((idx / max(1, total)) * 14)
-                                update_kw_progress(min(96, pct), message)
-
-                            note_files = write_note_keyword_articles(ideas, today_str, OBSIDIAN_VAULT_DIR, progress_cb=fallback_note_progress2)
-                            save_analysis(today_str, {"saved_at": saved_at, "ideas": ideas})
-                            update_kw_progress(100, "AI Noteキーワードと原稿の保存が完了しました。")
-                            st.success(f"AI Noteソース/原稿Markdownを {len(note_files)} 件保存しました。")
-                            st.session_state["kw_viewing_date"] = today_str
-                            st.rerun()
-                    except Exception as e2:
-                        st.error(f"フォールバックも失敗: {e2}")
-
-
-# ═══════════════════════════════════════════════
 #  メインコンテンツ：Obsidian 出力ページ
 # ═══════════════════════════════════════════════
 elif nav_page == "obsidian":
@@ -4193,7 +4353,7 @@ elif nav_page == "obsidian":
 
     st.markdown("""
 <div style="color:#ffffff; line-height:1.8; font-size:0.86rem;">
-  文章生成はOllama gemma4を使います。Ollamaに接続できない場合だけ、通常生成で補完します。
+  文章生成・分類・要約はOllama gemma4を優先します。Ollamaに接続できない場合のみ、ルールベース生成で補完します。
 </div>
 """, unsafe_allow_html=True)
 
@@ -4228,7 +4388,9 @@ elif nav_page == "obsidian":
     <div class="kw-section-title">収集件数</div>
     <div class="kw-text">AIニュース {result['news_count']} 件 / AI情報 {result['info_count']} 件</div>
     <div class="kw-section-title">生成ファイル</div>
-    <div class="kw-text">カテゴリ別 {result['source_files']} 件 / ニュース個別 {result['item_files']} 件 / テーマ別 {result['summary_files']} 件 / 記事ドラフト {result['draft_files']} 件</div>
+    <div class="kw-text">カテゴリ別 {result['source_files']} 件 / ニュース個別 {result['item_files']} 件 / fact {result['fact_files']} 件 / 仮説 {result['hypothesis_files']} 件 / テーマ別 {result['summary_files']} 件 / トレンド {result['trend_files']} 件 / 記事ドラフト {result['draft_files']} 件 / 完成候補 {result['article_files']} 件 / AI Note {result['ai_note_files']} 件 / arXiv {result['arxiv_files']} 件 / ログ {result['log_files']} 件</div>
+    <div class="kw-section-title">処理ログ</div>
+    <div class="kw-text">本文取得失敗 {result['body_failed_count']} 件 / 除外 {result['excluded_count']} 件<br>{result['log']}</div>
     <div class="kw-section-title">ドラフト生成</div>
     <div class="kw-text">{result['draft_method']}</div>
   </div>
@@ -4242,7 +4404,7 @@ elif nav_page == "obsidian":
     st.markdown("""
 <div style="color:#ffffff; line-height:1.9; font-size:0.86rem;">
   <strong>生成される構成</strong><br>
-  00_Inbox / 01_News_Sources / 02_Theme_Summaries / 03_Article_Drafts / 04_Published / 99_Templates
+  00_Inbox / 01_News_Sources / 02_Theme_Summaries / 03_Article_Drafts / 04_Published / 05_fact / 06_hypothesis / 07_trend / 08_article / 09_AI_Note / 10_arXiv / 11_Logs / 99_Templates
 </div>
 """, unsafe_allow_html=True)
 
@@ -4263,7 +4425,7 @@ elif nav_page == "obsidian":
         with read_col1:
             read_section = st.selectbox(
                 "読む種類",
-                ["記事ドラフト", "テーマ別まとめ", "ニュースソース", "Inbox"],
+                ["AI Note", "完成候補記事", "記事ドラフト", "テーマ別まとめ", "fact", "仮説", "トレンド", "arXiv", "ログ", "ニュースソース", "Inbox"],
                 key="obs_read_section",
             )
         with read_col2:
